@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-     <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ловец Настя</title>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -17,7 +17,7 @@
             padding: 0;
             background-color: #4CAF50;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,240 +47,181 @@
             height: 100%;
             pointer-events: none;
             z-index: 10;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
         }
 
-        .ui-panel {
-            background: rgba(0,0,0,0.4);
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            margin-bottom: 10px; 
-        }
-        
-        #score {
+        /* --- Новый блок статистики вверху по центру --- */
+        #gameStatsDisplay {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-size: 18px; 
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%); /* Центрирование */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование элементов внутри */
+            gap: 8px; 
+            background: rgba(0,0,0,0.55); /* Полупрозрачный черный фон */
+            padding: 3px 4px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+            min-width: 220px; /* Минимальная ширина для читаемости */
+        }
+
+        #levelInfoContainer { 
+            text-align: center; /* Текст уровня по центру */
+        }
+        #levelText {
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            margin-bottom: 4px;
+        }
+        .progress-bar-level { 
+            width: 200px; /* Ширина прогресс-бара уровня */
+            height: 12px;
+            background: rgba(255,255,255,0.2); /* Светлее фон для прогресса */
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 0 auto; /* Центрируем сам прогресс-бар */
+        }
+        .progress-fill-level {
+            height: 100%;
+            background: linear-gradient(90deg, #81C784, #A5D6A7);
+            border-radius: 6px;
+            transition: width 0.3s ease;
         }
         
-        #lives {
-            position: absolute;
-            top: 45px; 
-            left: 10px;
-            color: white;
-            font-size: 16px; 
+        #scoreDisplay { 
+            font-size: 22px;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
-         #lives .heart, #lives .empty-heart {
-            font-size: 16px;
+
+        #healthBarContainer {
+            width: 200px; /* Ширина как у прогресс-бара уровня */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Текст HP по центру */
         }
-        #lives div[style*="font-size: 12px"] { 
-            font-size: 10px !important;
+        #healthLabel {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 3px;
         }
+        #healthBarOuter {
+            width: 100%;
+            height: 18px; 
+            background-color: rgba(255,255,255,0.2); /* Светлее фон */
+            border-radius: 9px;
+            padding: 2px; 
+            box-sizing: border-box;
+        }
+        #healthBarFill {
+            height: 100%;
+            background-color: #4CAF50; 
+            border-radius: 7px; 
+            transition: width 0.3s ease, background-color 0.3s ease;
+            text-align: center; 
+            line-height: 14px;  
+            font-size: 10px;    
+            color: white;
+            font-weight: bold;
+        }
+        /* --- Конец блока статистики --- */
         
-        #controls {
+        #controls { 
             position: absolute;
             top: 10px;
             right: 10px;
-            color: white;
             font-size: 12px; 
             text-align: right;
             background: rgba(0,0,0,0.5); 
             padding: 8px;
             border-radius: 5px;
             pointer-events: auto;
-            display: none; /* Скрыты по умолчанию, будут показаны JS для десктопа */
+            display: none; 
         }
-        
-        #sizeControls {
-            margin-top: 5px;
-        }
-        
-        .size-control {
-            margin: 3px 0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 5px;
-        }
-        
-        .size-control input {
-            width: 45px; 
-            padding: 1px 3px;
-            font-size: 10px;
-        }
-        
-        .size-control label {
-            min-width: auto; 
-            font-size: 10px;
-            text-align: right;
-        }
+        #sizeControls { margin-top: 5px; }
+        .size-control { margin: 3px 0; display: flex; align-items: center; justify-content: flex-end; gap: 5px;}
+        .size-control input { width: 45px; padding: 1px 3px; font-size: 10px;}
+        .size-control label { min-width: auto; font-size: 10px; text-align: right;}
         
         #gameOver {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-size: 24px; 
-            font-weight: bold;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-size: 24px; font-weight: bold; text-align: center;
             background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 15px;
-            display: none;
-            z-index: 20;
-            width: 80%;
+            padding: 20px; border-radius: 15px;
+            display: none; z-index: 20; width: 80%;
+            pointer-events: auto !important;
         }
-         #gameOver div[style*="font-size: 24px"] { 
-            font-size: 18px !important;
-            margin: 10px 0 !important;
-        }
-        #gameOver div[style*="font-size: 18px"] { 
-            font-size: 14px !important;
-        }
+         #gameOver div[style*="font-size: 24px"] { font-size: 18px !important; margin: 10px 0 !important;}
+         #gameOver div[style*="font-size: 18px"] { font-size: 14px !important;}
         
-        #levelProgress {
+        #slowdownInfo { /* Позиционируем относительно нижнего края статистики */
             position: absolute;
-            top: 5px; 
+            top: calc(15px + 120px); /* Примерно: top от gameStatsDisplay + его высота + отступ */
             left: 50%;
             transform: translateX(-50%);
-            width: 60%; 
-            min-width: 150px; 
-            color: white;
-            text-align: center;
-            font-size: 12px; 
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 15px; 
+            color: #FFEB3B; font-size: 12px; font-weight: bold;
+            display: none; padding: 5px 10px;
             background: rgba(0,0,0,0.5);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 3px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #81C784);
-            border-radius: 8px;
-            transition: width 0.3s ease;
-        }
-        
-        #slowdownInfo {
-            position: absolute;
-            top: 85px; 
-            left: 10px;
-            color: #FFEB3B; 
-            font-size: 12px; 
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
-            display: none;
-            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
         }
 
         #buffMessage {
             position: absolute;
-            top: 40%; 
-            left: 50%;
+            top: 40%; left: 50%;
             transform: translate(-50%, -50%);
-            color: #81C784; 
-            font-size: 20px; 
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            color: #81C784; font-size: 20px; font-weight: bold;
             background: rgba(0,0,0,0.65);
-            padding: 10px 15px;
-            border-radius: 10px;
-            display: none;
-            z-index: 20; 
+            padding: 10px 15px; border-radius: 10px;
+            display: none; z-index: 20; 
         }
 
         #mobileControls {
-			display: none;
             position: fixed; 
-            bottom: 15px;    
-            left: 50%;
-            transform: translateX(-50%);
-            display: none; /* Скрыты по умолчанию, будут показаны JS для мобильных */
-            z-index: 15; 
-            gap: 30px; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;  
+            z-index: 12;    
+            pointer-events: none; 
         }
-
-        .mobile-button {
-            width: 65px; 
-            height: 65px;
-            background-color: rgba(0, 0, 0, 0.5); 
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.7); 
-            border-radius: 50%;
-            font-size: 28px; 
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
+        .touch-area {
+            position: absolute; top: 0; height: 100%; width: 50%; 
+            pointer-events: auto; 
+            user-select: none; -webkit-tap-highlight-color: transparent; 
         }
-
-        .mobile-button:active {
-            background-color: rgba(0, 0, 0, 0.7);
-            transform: scale(0.95); 
-        }
+        #touchAreaLeft { left: 0; }
+        #touchAreaRight { right: 0; }
         
         #muteButton {
             position: fixed;
-            top: 10px;
-            right: 10px; /* Будет сдвинут если #controls видимы */
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            border: 1px solid white;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 25; /* Выше всего */
-            pointer-events: auto; /* Чтобы можно было нажать */
+            top: 10px; right: 10px; 
+            width: 40px; height: 40px;
+            background-color: rgba(0,0,0,0.5); color: white;
+            border: 1px solid white; border-radius: 50%;
+            font-size: 20px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 25; pointer-events: auto; 
         }
 
+        @media (min-width: 769px) { /* Десктопные стили */
+            #gameStatsDisplay { top: 20px; padding: 12px 20px; min-width: 250px; gap: 10px;}
+            #levelText { font-size: 22px; }
+            .progress-bar-level { width: 220px; height: 15px; }
+            #scoreDisplay { font-size: 28px; }
+            #healthBarContainer { width: 220px; }
+            #healthLabel { font-size: 16px; }
+            #healthBarOuter { height: 22px; }
+            #healthBarFill { line-height: 18px; font-size: 12px; }
 
-        @media (min-width: 769px) {
-            #score {
-                font-size: 24px;
-                top: 20px;
-                left: 20px;
-            }
-            #lives {
-                font-size: 20px;
-                top: 75px;
-                left: 20px;
-            }
-            #lives .heart, #lives .empty-heart {
-                font-size: 18px;
-            }
-            #lives div[style*="font-size: 10px"] { 
-                font-size: 12px !important;
-            }
-            /* #controls - будет показан JS */
+            #slowdownInfo { top: calc(20px + 150px); font-size: 16px;}
+            
             #controls { 
-                font-size: 14px;
-                padding: 10px;
-                top: 20px;
-                right: 20px;
+                font-size: 14px; padding: 10px;
+                top: 20px; right: 20px;
             }
-
             #sizeControls { margin-top: 10px; }
             .size-control { margin: 5px 0; gap: 10px; }
             .size-control input { width: 60px; padding: 2px 5px; font-size: 12px;}
@@ -290,77 +231,63 @@
              #gameOver div[style*="font-size: 18px"] { font-size: 24px !important; margin: 15px 0 !important;}
              #gameOver div[style*="font-size: 14px"] { font-size: 18px !important;}
 
-
-            #levelProgress {
-                width: 300px;
-                font-size: 14px; 
-                top: 10px;
-            }
-            .progress-bar { height: 20px; margin-top: 5px; }
-            #slowdownInfo {
-                font-size: 16px;
-                top: 160px;
-                left: 20px;
-            }
             #buffMessage { font-size: 28px; padding: 15px 25px;}
 
-            #muteButton { /* Позиция кнопки звука на десктопе */
+            #muteButton { 
                 top: 20px;
-                right: 190px; /* Правее блока #controls */
+                /* Динамическое позиционирование будет в JS */
             }
-            /* Если #controls очень широкий, можно сдвинуть еще левее */
-            /* Если #controls скрыт, то #muteButton будет справа вверху */
         }
-        @media (max-width: 768px) {
-             #muteButton { /* Позиция кнопки звука на мобильных */
+        @media (max-width: 768px) { 
+             #muteButton { 
                 top: 10px;
                 right: 10px;
             }
+            #gameStatsDisplay { min-width: 200px; padding: 8px 12px; gap: 6px; }
+            #levelText { font-size: 16px; }
+            .progress-bar-level { width: 180px; }
+            #scoreDisplay { font-size: 20px; }
+            #healthBarContainer { width: 180px; }
         }
-
         @media (max-width: 360px) {
-            .mobile-button {
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
-            }
-            #mobileControls {
-			    display: visibility;
-                gap: 20px;
-                bottom: 10px;
-            }
-            #muteButton {
-                width: 35px;
-                height: 35px;
-                font-size: 18px;
-            }
+            #muteButton { width: 35px; height: 35px; font-size: 18px;}
+            #gameStatsDisplay { top: 10px; min-width: 180px; padding: 6px 10px; gap: 4px;}
+            #levelText { font-size: 14px; }
+            .progress-bar-level { width: 150px; height: 10px; }
+            #scoreDisplay { font-size: 18px; }
+            #healthBarContainer { width: 150px; }
+            #healthLabel { font-size: 12px; }
+            #healthBarOuter { height: 16px; }
+            #healthBarFill { line-height: 12px; font-size: 9px; }
+            #slowdownInfo { top: calc(10px + 100px); font-size: 11px;} /* Приблизительно */
         }
-
     </style>
 </head>
 <body>
-    <audio id="backgroundMusic" loop>
-        <source src="music.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-    <button id="muteButton">🔊</button> <!-- Кнопка для вкл/выкл звука -->
+    <audio id="backgroundMusic"></audio>
+    <button id="muteButton">🔇</button> 
 
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         <div id="gameUI">
-            <div id="score" class="ui-panel">Счет: 0</div>
-            <div id="lives" class="ui-panel">
-                <span id="heartsDisplay"></span>
-                <div style="font-size: 12px; margin-top: 5px;">Восстановление: <span id="regenTimer">60</span>с</div>
-            </div>
-            <div id="levelProgress" class="ui-panel">
-                <div>Уровень <span id="level">1</span> - Прогресс</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            <div id="gameStatsDisplay">
+                <div id="levelInfoContainer">
+                    <div id="levelText">Уровень: <span id="levelNumber">1</span></div>
+                    <div class="progress-bar-level">
+                        <div class="progress-fill-level" id="levelProgressFill"></div>
+                    </div>
+                </div>
+                <div id="scoreDisplay">Счет: <span id="scoreValue">0</span></div>
+                <div id="healthBarContainer">
+                    <div id="healthLabel">HP</div>
+                    <div id="healthBarOuter">
+                        <div id="healthBarFill"></div>
+                    </div>
                 </div>
             </div>
-             <div id="slowdownInfo" class="ui-panel">Замедление: 20.0с</div>
-             <div id="buffMessage"></div>
+
+            <div id="slowdownInfo" class="ui-panel">Замедление: 20.0с</div>
+            <div id="buffMessage"></div>
 
             <div id="controls">
                 <div>Управление: ← → / A D</div>
@@ -387,28 +314,28 @@
             </div>
         </div>
         <div id="mobileControls">
-            <button id="moveLeftButton" class="mobile-button">◀</button>
-            <button id="moveRightButton" class="mobile-button">▶</button>
+             <div id="touchAreaLeft" class="touch-area"></div>
+             <div id="touchAreaRight" class="touch-area"></div>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const scoreElement = document.getElementById('score');
-        const livesElement = document.getElementById('heartsDisplay');
+        const levelNumberElement = document.getElementById('levelNumber');
+        const levelProgressFillElement = document.getElementById('levelProgressFill');
+        const scoreValueElement = document.getElementById('scoreValue');
+        const healthBarFillElement = document.getElementById('healthBarFill');
         const gameOverElement = document.getElementById('gameOver');
         const finalScoreElement = document.getElementById('finalScore');
-        const regenTimerElement = document.getElementById('regenTimer');
-        const levelElement = document.getElementById('level');
-        const progressFillElement = document.getElementById('progressFill');
         const slowdownInfoElement = document.getElementById('slowdownInfo');
         const buffMessageElement = document.getElementById('buffMessage');
         const controlsElement = document.getElementById('controls'); 
         const mobileControlsElement = document.getElementById('mobileControls');
+        const touchAreaLeft = document.getElementById('touchAreaLeft');
+        const touchAreaRight = document.getElementById('touchAreaRight');
         const backgroundMusic = document.getElementById('backgroundMusic');
         const muteButton = document.getElementById('muteButton');
-
 
         const playerSizeInput = document.getElementById('playerSizeInput');
         const itemSizeInput = document.getElementById('itemSizeInput');
@@ -422,36 +349,36 @@
 
         let score = 0;
         let lives = 5;
-        let maxLives = 5;
+        let maxLives = 5; 
         let gameRunning = true;
         let animationId;
         let level = 1;
         let gameSpeed = 1.0; 
-        let regenTimer = 60;
-        let lastRegenTime = Date.now();
-
+        
         const DEBUFF_DURATION = 20000; 
         let playerOriginalSpeed = 8; 
+        let mobilePlayerSpeed = 5;
         let isPlayerSlowed = false;
         let slowdownEndTime = 0;
         let buffMessageTimeout = null;
-        let musicPlaying = false; // Флаг для отслеживания состояния музыки
-
+        
+        const playlist = ['music.mp3', 'music2.mp3']; 
+        let currentTrackIndex = 0;
+        let musicShouldPlay = false; 
+        let musicManuallyPaused = false;
+        let  = false; // <--- НОВЫЙ ФЛАГ для отслеживания взаимодействия
 
         let desktopPlayerSize = 200;
         let desktopItemSize = 100;
         let desktopEnemySize = 100;
-        
         let mobilePlayerSize = 90;  
         let mobileItemSize = 45;    
         let mobileEnemySize = 45;   
         let mobileDebafBafSize = 50; 
-
         let currentPlayerSize = desktopPlayerSize;
         let currentItemSize = desktopItemSize;
         let currentEnemySize = desktopEnemySize;
         let currentDebafBafSize = 70; 
-
 
         const background = new Image();
         background.src = 'bg.png'; 
@@ -461,11 +388,10 @@
             x: canvas.width / 2,
             y: canvas.height - 120, 
             baseWidth: 398, baseHeight: 780, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ GG.PNG
-            speed: 8,
+            speed: playerOriginalSpeed,
             img: new Image()
         };
-        playerOriginalSpeed = player.speed;
-
+        
         function updatePlayerPosition() {
             const playerSize = getPlayerSize();
             player.y = canvas.height - playerSize.height - Math.max(10, canvas.height * 0.02); 
@@ -473,538 +399,322 @@
 
         function getPlayerSize() {
             let size = currentPlayerSize;
-            if (controlsElement.style.display !== 'none' && playerSizeInput.value) { 
+            if (controlsElement.style.display === 'block' && playerSizeInput.value) { 
                 size = parseInt(playerSizeInput.value) || currentPlayerSize;
             }
             return { width: size, height: Math.round(size * (player.baseHeight/player.baseWidth)) };
         }
 
-        const items = [];
-        const enemies = [];
-        const debafs = []; 
-        const bafs = [];   
-
-        const itemTemplate = {
-            baseWidth: 292, baseHeight: 323, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ ITEM.PNG
-            speed: 3, img: new Image()
-        };
-        const enemyTemplate = {
-            baseWidth: 386, baseHeight: 379, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ ENEMY.PNG
-            speed: 2.5, img: new Image()
-        };
-        const debafTemplate = { 
-            baseWidth: 162, baseHeight: 163, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ DEBAF.PNG
-            speed: 2.2, img: new Image()
-        };
-        const bafTemplate = { 
-            baseWidth: 139, baseHeight: 154,  // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ BAF.PNG
-            speed: 2.8, img: new Image()
-        };
+        const items = []; const enemies = []; const debafs = []; const bafs = [];   
+        const itemTemplate = { baseWidth: 292, baseHeight: 323, speed: 3, img: new Image() }; 
+        const enemyTemplate = { baseWidth: 386, baseHeight: 379, speed: 2.5, img: new Image() };
+        const debafTemplate = { baseWidth: 162, baseHeight: 163, speed: 2.2, img: new Image() };
+        const bafTemplate = { baseWidth: 139, baseHeight: 154, speed: 2.8, img: new Image() }; 
 
         function getItemSize() {
             let size = currentItemSize;
-             if (controlsElement.style.display !== 'none' && itemSizeInput.value) {
+             if (controlsElement.style.display === 'block' && itemSizeInput.value) {
                 size = parseInt(itemSizeInput.value) || currentItemSize;
             }
             return { width: size, height: Math.round(size * (itemTemplate.baseHeight/itemTemplate.baseWidth)) };
         }
         function getEnemySize() {
             let size = currentEnemySize;
-             if (controlsElement.style.display !== 'none' && enemySizeInput.value) {
+             if (controlsElement.style.display === 'block' && enemySizeInput.value) {
                 size = parseInt(enemySizeInput.value) || currentEnemySize;
             }
             return { width: size, height: Math.round(size * (enemyTemplate.baseHeight/enemyTemplate.baseWidth)) };
         }
-        
-        function getDebafSize() {
-            return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (debafTemplate.baseHeight/debafTemplate.baseWidth)) };
-        }
-        function getBafSize() {
-             return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (bafTemplate.baseHeight/bafTemplate.baseWidth)) };
-        }
+        function getDebafSize() { return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (debafTemplate.baseHeight/debafTemplate.baseWidth)) }; }
+        function getBafSize() { return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (bafTemplate.baseHeight/bafTemplate.baseWidth)) }; }
 
-        player.img.src = 'gg.png'; 
-        itemTemplate.img.src = 'item.png'; 
-        enemyTemplate.img.src = 'enemy.png'; 
-        debafTemplate.img.src = 'debaf.png'; 
-        bafTemplate.img.src = 'baf.png'; 
-
+        player.img.src = 'gg.png'; itemTemplate.img.src = 'item.png'; enemyTemplate.img.src = 'enemy.png'; 
+        debafTemplate.img.src = 'debaf.png'; bafTemplate.img.src = 'baf.png'; 
         [player.img, itemTemplate.img, enemyTemplate.img, debafTemplate.img, bafTemplate.img].forEach(img => {
             img.onerror = function() { console.log(`Изображение ${this.src.substring(this.src.lastIndexOf('/')+1)} не найдено`); };
         });
 
         const keys = {};
-        let moveLeftActive = false;
-        let moveRightActive = false;
+        let moveLeftActive = false; let moveRightActive = false;
 
-        document.addEventListener('keydown', (e) => {
+        // --- ОБРАБОТЧИК ПЕРВОГО ВЗАИМОДЕЙСТВИЯ ДЛЯ МУЗЫКИ ---
+        function handleFirstInteraction() {
+            if (!userInteracted) {
+                userInteracted = true;
+                console.log("First user interaction detected.");
+                musicShouldPlay = true; // Разрешаем музыке играть
+                tryToPlayMusic();     // Пытаемся запустить
+                // Удаляем обработчики, чтобы не срабатывали повторно
+                document.removeEventListener('click', handleFirstInteraction);
+                document.removeEventListener('keydown', handleFirstInteraction);
+                document.removeEventListener('touchstart', handleFirstInteraction);
+            }
+        }
+        document.addEventListener('click', handleFirstInteraction, { once: true }); // once: true для body может не сработать везде
+        document.addEventListener('keydown', handleFirstInteraction, { once: true });
+        document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+        // --- КОНЕЦ ОБРАБОТЧИКА ПЕРВОГО ВЗАИМОДЕЙСТВИЯ ---
+
+
+        document.addEventListener('keydown', (e) => { // Этот обработчик остается для управления игрой
             const key = e.key.toLowerCase();
             keys[key] = true; 
             if (key === 'r' && !gameRunning) restartGame();
-            tryToPlayMusic(); // Попытка запустить музыку при первом взаимодействии
         });
         document.addEventListener('keyup', (e) => { 
             keys[e.key.toLowerCase()] = false; 
         });
-        // Попытка запустить музыку при первом тапе (для мобильных)
-        document.body.addEventListener('touchstart', tryToPlayMusic, { once: true });
-
 
         function createItem() {
             const size = getItemSize();
-            items.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50, 
-                width: size.width, height: size.height,
-                speed: (2 + Math.random() * 1.5) * gameSpeed, 
-                img: itemTemplate.img, type: 'item'
-            });
+            items.push({ x: Math.random()*(canvas.width-size.width), y: -size.height-Math.random()*50, 
+                         width: size.width, height: size.height, speed: (2+Math.random()*1.5)*gameSpeed, 
+                         img: itemTemplate.img, type: 'item' });
         }
         function createEnemy() {
             const size = getEnemySize();
-            enemies.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
-                width: size.width, height: size.height,
-                speed: (1.5 + Math.random() * 1) * gameSpeed, 
-                img: enemyTemplate.img, type: 'enemy'
-            });
+            enemies.push({ x: Math.random()*(canvas.width-size.width), y: -size.height-Math.random()*50,
+                           width: size.width, height: size.height, speed: (1.5+Math.random()*1)*gameSpeed, 
+                           img: enemyTemplate.img, type: 'enemy' });
         }
         function createDebaf() {
             const size = getDebafSize();
-            debafs.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
-                width: size.width, height: size.height,
-                speed: (debafTemplate.speed + Math.random() * 0.5) * gameSpeed,
-                img: debafTemplate.img, type: 'debaf'
-            });
+            debafs.push({ x: Math.random()*(canvas.width-size.width), y: -size.height-Math.random()*50,
+                          width: size.width, height: size.height, speed: (debafTemplate.speed+Math.random()*0.5)*gameSpeed, 
+                          img: debafTemplate.img, type: 'debaf' });
         }
         function createBaf() {
             const size = getBafSize();
-            bafs.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
-                width: size.width, height: size.height,
-                speed: (bafTemplate.speed + Math.random() * 0.5) * gameSpeed,
-                img: bafTemplate.img, type: 'baf'
-            });
+            bafs.push({ x: Math.random()*(canvas.width-size.width), y: -size.height-Math.random()*50,
+                        width: size.width, height: size.height, speed: (bafTemplate.speed+Math.random()*0.5)*gameSpeed, 
+                        img: bafTemplate.img, type: 'baf' });
         }
 
-        function updateLevel() {
+        function updateLevelAndScoreDisplays() {
+            levelNumberElement.textContent = level;
+            scoreValueElement.textContent = score;
+            const progressInLevel = score % 100; // Теперь просто остаток для прогресса от 0 до 99
+            levelProgressFillElement.style.width = progressInLevel + '%'; // Используем напрямую
+        }
+
+        function updateLevelLogic() { 
             const newLevel = Math.floor(score / 100) + 1;
             if (newLevel !== level) {
                 level = newLevel;
-                gameSpeed = 0.8 + (level - 1) * 0.08; // Базовое ускорение игры
-                levelElement.textContent = level;
+                gameSpeed = 0.8 + (level - 1) * 0.1; 
             }
-            const progressInLevel = (score % 100) / 100;
-            progressFillElement.style.width = (progressInLevel * 100) + '%';
+            updateLevelAndScoreDisplays(); 
+        }
+        
+        function updateHealthBar() {
+            const healthPercentage = Math.max(0, (lives / maxLives) * 100); // Убедимся, что не меньше 0
+            healthBarFillElement.style.width = healthPercentage + '%';
+            if (healthPercentage > 60) healthBarFillElement.style.backgroundColor = '#4CAF50'; 
+            else if (healthPercentage > 30) healthBarFillElement.style.backgroundColor = '#FFC107'; 
+            else healthBarFillElement.style.backgroundColor = '#F44336'; 
         }
 
         function getSpawnRates() {
-            const baseItemRate = 0.012; 
-            const baseEnemyRate = 0.0030; // Слегка уменьшаем базовый шанс врага
-            const baseDebafRate = 0.0004; // Слегка уменьшаем базовый шанс дебафа
-            const baseBafRate = 0.0018;   
-
-            // Для врагов:
-            // На 1 уровне: 0.0025 + 0.0010 = 0.0035 (0.35%)
-            // На 5 уровне: 0.0025 + 0.0050 = 0.0075 (0.75%)
-            // На 10 уровне: 0.0025 + 0.0100 = 0.0125 (1.25%)
-            // На 20 уровне: 0.0025 + 0.0200 = 0.0225 (2.25%)
-            // Можно сделать рост еще более крутым, увеличив множитель 0.0010
-            const enemyGrowthFactor = 0.0010 * level; // Более крутой рост с уровнем
-            
-            // Для дебафов, оставим предыдущий вариант или тоже усилим
-            // На 1 уровне: 0.0004 + 0.0002 = 0.0006 (0.06%)
-            // На 10 уровне: 0.0004 + 0.0020 = 0.0024 (0.24%)
-            const debafGrowthFactor = 0.0005 * level; 
-
+            const baseItemRate = 0.010; const baseEnemyRate = 0.0025; const baseDebafRate = 0.0004; const baseBafRate = 0.0018;   
+            const enemyGrowthFactor = 0.0010 * level; const debafGrowthFactor = 0.0002 * level; 
+            const itemGrowth = (level - 1) * 0.0025; const maxItemRate = 0.05; 
             return {
-                itemRate: baseItemRate + (level - 1) * 0.0015,
-                enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.3), // Макс. шанс 6%
-                debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.1), // Макс. шанс 1.5%
-                bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.1)   
+                itemRate: Math.min(baseItemRate + itemGrowth, maxItemRate),
+                enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.08), 
+                debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.02), 
+                bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)   
             };
         }
         
         function showTemporaryMessage(element, message, duration) {
-            element.textContent = message;
-            element.style.display = 'block';
-            if (element === buffMessageElement && buffMessageTimeout) {
-                clearTimeout(buffMessageTimeout);
-            }
-            buffMessageTimeout = setTimeout(() => {
-                element.style.display = 'none';
-            }, duration);
+            element.textContent = message; element.style.display = 'block';
+            if (element === buffMessageElement && buffMessageTimeout) clearTimeout(buffMessageTimeout);
+            buffMessageTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
         }
-
-        function updateLives() {
-            const now = Date.now();
-            const timePassed = (now - lastRegenTime) / 1000;
-            if (lives < maxLives) {
-                regenTimer -= timePassed;
-                if (regenTimer <= 0) {
-                    lives = Math.min(maxLives, lives + 1);
-                    regenTimer = 60;
-                    updateLivesDisplay();
-                }
-            } else {
-                regenTimer = 60;
-            }
-            regenTimerElement.textContent = Math.ceil(regenTimer);
-            lastRegenTime = now;
-        }
-
-        function updateLivesDisplay() {
-            let heartsHtml = '';
-            for (let i = 0; i < maxLives; i++) {
-                heartsHtml += (i < lives) ? '<span class="heart">♥</span>' : '<span class="empty-heart">♡</span>';
-            }
-            livesElement.innerHTML = heartsHtml;
-        }
+        
+        function isMobileModeActive() { return window.innerWidth <= 768; }
 
         function updatePlayer() {
-            const playerSize = getPlayerSize();
-            updatePlayerPosition(); 
-
+            const playerSize = getPlayerSize(); updatePlayerPosition(); 
             const movingLeft = keys['arrowleft'] || keys['a'] || moveLeftActive;
             const movingRight = keys['arrowright'] || keys['d'] || moveRightActive;
-
-            if (movingLeft && player.x > 0) {
-                player.x -= player.speed;
-            }
-            if (movingRight && player.x < canvas.width - playerSize.width) {
-                 player.x += player.speed;
-            }
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - playerSize.width) player.x = canvas.width - playerSize.width;
-
+            if (movingLeft && player.x > 0) player.x -= player.speed; 
+            if (movingRight && player.x < canvas.width - playerSize.width) player.x += player.speed;
+            if (player.x < 0) player.x = 0; if (player.x > canvas.width - playerSize.width) player.x = canvas.width - playerSize.width;
             if (isPlayerSlowed) {
+                const baseSpeedForDebuff = isMobileModeActive() ? mobilePlayerSpeed : playerOriginalSpeed;
                 const remainingSlowdown = Math.max(0, (slowdownEndTime - Date.now()) / 1000);
                 slowdownInfoElement.textContent = `Замедление: ${remainingSlowdown.toFixed(1)}с`;
                 if (remainingSlowdown <= 0) {
-                    isPlayerSlowed = false;
-                    player.speed = playerOriginalSpeed;
+                    isPlayerSlowed = false; player.speed = baseSpeedForDebuff; 
                     slowdownInfoElement.style.display = 'none';
                 }
             }
         }
 
-        function updateGameObjects(arr, onCollect, onMiss) {
+        function updateGameObjects(arr, onCollect) { // Убрал onMiss, т.к. не используется
             const playerSize = getPlayerSize(); 
             for (let i = arr.length - 1; i >= 0; i--) {
-                const obj = arr[i];
-                obj.y += obj.speed;
-                if (obj.x + obj.width > player.x && 
-                    obj.x < player.x + playerSize.width && 
-                    obj.y + obj.height > player.y && 
-                    obj.y < player.y + playerSize.height) { 
-                    onCollect(obj, i); 
-                    continue; 
+                const obj = arr[i]; obj.y += obj.speed;
+                if (obj.x + obj.width > player.x && obj.x < player.x + playerSize.width && 
+                    obj.y + obj.height > player.y && obj.y < player.y + playerSize.height) { 
+                    onCollect(obj, i); continue; 
                 }
-                if (obj.y > canvas.height + 50) { 
-                    if (onMiss) onMiss(obj, i); 
-                    arr.splice(i, 1);
-                }
+                if (obj.y > canvas.height + 50) arr.splice(i, 1);
             }
         }
 
-        function updateItems() {
-            updateGameObjects(items, (item, i) => {
-                items.splice(i, 1);
-                score += 10;
-                scoreElement.textContent = `Счет: ${score}`;
-                updateLevel();
-            });
-        }
-        function updateEnemies() {
-            updateGameObjects(enemies, (enemy, i) => {
-                enemies.splice(i, 1);
-                lives--;
-                updateLivesDisplay();
-                if (lives <= 0) endGame();
-            });
-        }
+        function updateItems() { updateGameObjects(items, (item, i) => { items.splice(i, 1); score += 10; updateLevelLogic(); }); }
+        function updateEnemies() { updateGameObjects(enemies, (enemy, i) => { enemies.splice(i, 1); lives--; updateHealthBar(); if (lives <= 0) endGame(); }); }
         function updateDebafs() {
             updateGameObjects(debafs, (debaf, i) => {
-                debafs.splice(i, 1);
+                debafs.splice(i, 1); const currentBaseSpeed = isMobileModeActive() ? mobilePlayerSpeed : playerOriginalSpeed;
                 if (!isPlayerSlowed) { 
-                    isPlayerSlowed = true;
-                    player.speed = playerOriginalSpeed / 2; 
-                    slowdownEndTime = Date.now() + DEBUFF_DURATION;
-                    slowdownInfoElement.style.display = 'block';
+                    isPlayerSlowed = true; player.speed = currentBaseSpeed / 2; 
+                    slowdownEndTime = Date.now() + DEBUFF_DURATION; slowdownInfoElement.style.display = 'block';
                     showTemporaryMessage(buffMessageElement, "ЗАМЕДЛЕНИЕ!", 2000);
-                } else { 
-                     slowdownEndTime = Date.now() + DEBUFF_DURATION; 
-                     showTemporaryMessage(buffMessageElement, "Замедление продлено!", 1500);
-                }
+                } else { slowdownEndTime = Date.now() + DEBUFF_DURATION; showTemporaryMessage(buffMessageElement, "Замедление продлено!", 1500); }
             });
         }
         function updateBafs() {
             updateGameObjects(bafs, (baf, i) => {
                 bafs.splice(i, 1);
-                if (lives < maxLives) {
-                    lives++;
-                    updateLivesDisplay();
-                    showTemporaryMessage(buffMessageElement, "+1 ЖИЗНЬ!", 2000);
-                } else {
-                    showTemporaryMessage(buffMessageElement, "Здоровье полное!", 1500);
-                }
+                if (lives < maxLives) { lives++; updateHealthBar(); showTemporaryMessage(buffMessageElement, "+1 ЖИЗНЬ!", 2000); } 
+                else { showTemporaryMessage(buffMessageElement, "Здоровье полное!", 1500); }
             });
         }
 
         function drawBackground() {
             if (background.complete && background.naturalWidth > 0) {
                 const ar = background.naturalWidth / background.naturalHeight;
-                let drawWidth = canvas.width;
-                let drawHeight = canvas.width / ar;
-                if (drawHeight < canvas.height) { 
-                    drawHeight = canvas.height;
-                    drawWidth = canvas.height * ar;
-                }
-                const offsetX = (canvas.width - drawWidth) / 2;
-                const offsetY = (canvas.height - drawHeight) / 2;
-                ctx.drawImage(background, offsetX, offsetY, drawWidth, drawHeight);
-            } else {
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, '#87CEEB');
-                gradient.addColorStop(1, '#4CAF50');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
+                let dW = canvas.width; let dH = canvas.width / ar;
+                if (dH < canvas.height) { dH = canvas.height; dW = canvas.height * ar; }
+                const oX = (canvas.width - dW) / 2; const oY = (canvas.height - dH) / 2;
+                ctx.drawImage(background, oX, oY, dW, dH);
+            } else { const grad = ctx.createLinearGradient(0,0,0,canvas.height); grad.addColorStop(0,'#87CEEB'); grad.addColorStop(1,'#4CAF50'); ctx.fillStyle=grad; ctx.fillRect(0,0,canvas.width,canvas.height); }
         }
-
-        function drawPlayer() {
-            const playerSize = getPlayerSize();
-            if (player.img.complete && player.img.naturalWidth > 0) {
-                ctx.drawImage(player.img, player.x, player.y, playerSize.width, playerSize.height);
-            } else { 
-                ctx.fillStyle = '#FF6B6B';
-                ctx.fillRect(player.x, player.y, playerSize.width, playerSize.height);
-            }
-        }
-
-        function drawArray(arr, defaultColor = '#CCCCCC', shape = 'rect') {
-            arr.forEach(obj => {
-                if (obj.img.complete && obj.img.naturalWidth > 0) {
-                    ctx.drawImage(obj.img, obj.x, obj.y, obj.width, obj.height);
-                } else { 
-                    ctx.fillStyle = defaultColor;
-                    if (shape === 'rect') {
-                         ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-                    } else if (shape === 'diamond') {
-                        ctx.beginPath();
-                        ctx.moveTo(obj.x + obj.width/2, obj.y);
-                        ctx.lineTo(obj.x + obj.width, obj.y + obj.height/2);
-                        ctx.lineTo(obj.x + obj.width/2, obj.y + obj.height);
-                        ctx.lineTo(obj.x, obj.y + obj.height/2);
-                        ctx.closePath();
-                        ctx.fill();
-                    } else if (shape === 'triangle') {
-                        ctx.beginPath();
-                        ctx.moveTo(obj.x + obj.width/2, obj.y);
-                        ctx.lineTo(obj.x, obj.y + obj.height);
-                        ctx.lineTo(obj.x + obj.width, obj.y + obj.height);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                }
-            });
-        }
+        function drawPlayer() { const pS = getPlayerSize(); if (player.img.complete&&player.img.naturalWidth>0) ctx.drawImage(player.img,player.x,player.y,pS.width,pS.height); else {ctx.fillStyle='#FF6B6B';ctx.fillRect(player.x,player.y,pS.width,pS.height);} }
+        function drawArray(arr, dC = '#CCC', sh = 'rect') { arr.forEach(o=>{ if(o.img.complete&&o.img.naturalWidth>0)ctx.drawImage(o.img,o.x,o.y,o.width,o.height);else{ctx.fillStyle=dC;if(sh==='rect')ctx.fillRect(o.x,o.y,o.width,o.height);else if(sh==='diamond'){ctx.beginPath();ctx.moveTo(o.x+o.width/2,o.y);ctx.lineTo(o.x+o.width,o.y+o.height/2);ctx.lineTo(o.x+o.width/2,o.y+o.height);ctx.lineTo(o.x,o.y+o.height/2);ctx.closePath();ctx.fill();}else if(sh==='triangle'){ctx.beginPath();ctx.moveTo(o.x+o.width/2,o.y);ctx.lineTo(o.x,o.y+o.height);ctx.lineTo(o.x+o.width,o.y+o.height);ctx.closePath();ctx.fill();}}});}
 
         function gameLoop() {
             if (!gameRunning) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBackground();
-
-            updatePlayer(); 
-            updateItems();
-            updateEnemies();
-            updateDebafs();
-            updateBafs();
-            updateLives();
-
-            drawPlayer();
-            drawArray(items, '#FFD700', 'diamond');
-            drawArray(enemies, '#FF4757', 'triangle');
-            drawArray(debafs, '#BCA0DC', 'rect'); 
-            drawArray(bafs, '#90EE90', 'rect');   
-
-            const spawnRates = getSpawnRates();
-            if (items.length < 10 && Math.random() < spawnRates.itemRate) createItem(); 
-            if (enemies.length < 7 && Math.random() < spawnRates.enemyRate) createEnemy(); // Увеличил немного лимит врагов
-            if (debafs.length < 2 && Math.random() < spawnRates.debafRate) createDebaf();
-            if (bafs.length < 2 && Math.random() < spawnRates.bafRate) createBaf();
-
+            ctx.clearRect(0,0,canvas.width,canvas.height); drawBackground();
+            updatePlayer(); updateItems(); updateEnemies(); updateDebafs(); updateBafs(); 
+            drawPlayer(); drawArray(items,'#FFD700','diamond'); drawArray(enemies,'#FF4757','triangle');
+            drawArray(debafs,'#BCA0DC','rect'); drawArray(bafs,'#90EE90','rect');   
+            const sR = getSpawnRates();
+            if(items.length<10 && Math.random()<sR.itemRate)createItem(); 
+            if(enemies.length<8 && Math.random()<sR.enemyRate)createEnemy(); 
+            if(debafs.length<2 && Math.random()<sR.debafRate)createDebaf();
+            if(bafs.length<2 && Math.random()<sR.bafRate)createBaf();
             animationId = requestAnimationFrame(gameLoop);
         }
 
         function restartGame() {
-            score = 0;
-            lives = 5;
-            level = 1;
-            gameSpeed = 0.8; 
-            regenTimer = 60;
-            lastRegenTime = Date.now();
-            
-            isPlayerSlowed = false;
-            player.speed = playerOriginalSpeed; 
-            slowdownInfoElement.style.display = 'none';
-            if (buffMessageTimeout) clearTimeout(buffMessageTimeout);
-            buffMessageElement.style.display = 'none';
-
-            scoreElement.textContent = `Счет: ${score}`;
-            levelElement.textContent = level;
-            progressFillElement.style.width = '0%';
-            updateLivesDisplay();
-            
-            items.length = 0; enemies.length = 0; debafs.length = 0; bafs.length = 0;
-            
-            updatePlayerPosition(); 
-            player.x = canvas.width / 2 - getPlayerSize().width / 2; 
-
-            gameRunning = true;
-            gameOverElement.style.display = 'none';
-            if (animationId) cancelAnimationFrame(animationId); 
-            tryToPlayMusic(); // Попытка включить музыку при рестарте
+            score=0; lives=maxLives; level=1; gameSpeed=0.8; 
+            isPlayerSlowed=false; player.speed = isMobileModeActive()?mobilePlayerSpeed:playerOriginalSpeed;
+            slowdownInfoElement.style.display='none'; if(buffMessageTimeout)clearTimeout(buffMessageTimeout); buffMessageElement.style.display='none';
+            updateLevelAndScoreDisplays(); updateHealthBar();
+            items.length=0; enemies.length=0; debafs.length=0; bafs.length=0;
+            updatePlayerPosition(); player.x = canvas.width/2 - getPlayerSize().width/2; 
+            gameRunning=true; gameOverElement.style.display='none';
+            if(animationId)cancelAnimationFrame(animationId); 
             gameLoop();
         }
-
-        function endGame() {
-            gameRunning = false;
-            finalScoreElement.textContent = score;
-            gameOverElement.style.display = 'block';
-            cancelAnimationFrame(animationId);
-            // Можно остановить музыку при окончании игры, если нужно
-            // backgroundMusic.pause();
-            // musicPlaying = false;
-            // muteButton.textContent = '🔇';
-        }
-
-        const moveLeftButton = document.getElementById('moveLeftButton');
-        const moveRightButton = document.getElementById('moveRightButton');
-
-        function isTouchDevice() {
-            return (('ontouchstart' in window) ||
-                   (navigator.maxTouchPoints > 0) ||
-                   (navigator.msMaxTouchPoints > 0));
-        }
+        function endGame() { gameRunning=false; finalScoreElement.textContent=score; gameOverElement.style.display='block'; cancelAnimationFrame(animationId); }
+        function isTouchDevice() { return (('ontouchstart' in window)||(navigator.maxTouchPoints>0)||(navigator.msMaxTouchPoints>0)); }
 
         function setupControlsBasedOnDevice() {
-            const touchDevice = isTouchDevice();
-            const narrowWindow = window.innerWidth <= 768;
-
-            if (narrowWindow) {
-                mobileControlsElement.style.display = 'flex';
-                controlsElement.style.display = 'none'; 
-
-                currentPlayerSize = mobilePlayerSize;
-                currentItemSize = mobileItemSize;
-                currentEnemySize = mobileEnemySize;
-                currentDebafBafSize = mobileDebafBafSize;
-            } else { // Desktop
-                 mobileControlsElement.style.display = 'none';
-                 controlsElement.style.display = 'block'; 
-                 currentPlayerSize = desktopPlayerSize;
-                 currentItemSize = desktopItemSize;
-                 currentEnemySize = desktopEnemySize;
-                 currentDebafBafSize = 70; 
+            const isMobile = isMobileModeActive();
+            if(isMobile){ mobileControlsElement.style.display='block'; controlsElement.style.display='none'; 
+                currentPlayerSize=mobilePlayerSize; currentItemSize=mobileItemSize; currentEnemySize=mobileEnemySize; currentDebafBafSize=mobileDebafBafSize;
+                player.speed = mobilePlayerSpeed;
+            } else { mobileControlsElement.style.display='none'; controlsElement.style.display='block'; 
+                 currentPlayerSize=desktopPlayerSize; currentItemSize=desktopItemSize; currentEnemySize=desktopEnemySize; currentDebafBafSize=70; 
+                 player.speed = playerOriginalSpeed;
             }
-            // Обновляем значения в инпутах, если они видимы
-            playerSizeInput.value = currentPlayerSize;
-            itemSizeInput.value = currentItemSize;
-            enemySizeInput.value = currentEnemySize;
+            playerSizeInput.value=currentPlayerSize; itemSizeInput.value=currentItemSize; enemySizeInput.value=currentEnemySize;
+            if(!isMobile && controlsElement.style.display==='block'){
+                 const cR=controlsElement.getBoundingClientRect(); muteButton.style.right=(window.innerWidth-cR.left+10)+'px'; muteButton.style.top=cR.top+'px';
+            } else if(isMobile){ muteButton.style.right='10px'; muteButton.style.top='10px';}
         }
         
-        moveLeftButton.addEventListener('touchstart', (e) => {
-            e.preventDefault(); 
-            moveLeftActive = true;
-            tryToPlayMusic(); 
-        }, { passive: false }); 
-        moveLeftButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            moveLeftActive = false;
-        }, { passive: false });
+        touchAreaLeft.addEventListener('touchstart',(e)=>{e.preventDefault();moveLeftActive=true;},{passive:false}); 
+        touchAreaLeft.addEventListener('touchend',(e)=>{e.preventDefault();moveLeftActive=false;},{passive:false});
+        touchAreaLeft.addEventListener('touchcancel',(e)=>{e.preventDefault();moveLeftActive=false;},{passive:false});
+        touchAreaRight.addEventListener('touchstart',(e)=>{e.preventDefault();moveRightActive=true;},{passive:false});
+        touchAreaRight.addEventListener('touchend',(e)=>{e.preventDefault();moveRightActive=false;},{passive:false});
+        touchAreaRight.addEventListener('touchcancel',(e)=>{e.preventDefault();moveRightActive=false;},{passive:false});
 
-        moveRightButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            moveRightActive = true;
-            tryToPlayMusic();
-        }, { passive: false });
-        moveRightButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            moveRightActive = false;
-        }, { passive: false });
+        gameOverElement.addEventListener('click',()=>{if(!gameRunning)restartGame();});
+        gameOverElement.addEventListener('touchstart',(e)=>{e.preventDefault();if(!gameRunning)restartGame();},{passive:false});
 
-        gameOverElement.addEventListener('click', () => { 
-             if (!gameRunning) restartGame();
-        });
-         gameOverElement.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (!gameRunning) restartGame();
-        }, { passive: false });
-
-        // --- Управление музыкой ---
-        function tryToPlayMusic() {
-            if (!musicPlaying && backgroundMusic.paused) {
-                backgroundMusic.volume = 0.3;
+        function tryToPlayMusic() { // Убрал isAutoplayAttempt, т.к. теперь вызывается только после userInteracted
+            if (!musicShouldPlay) return; 
+            if (backgroundMusic.paused) {
+                backgroundMusic.src = playlist[currentTrackIndex]; backgroundMusic.volume = 0.3;
                 const playPromise = backgroundMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.then(_ => {
-                        musicPlaying = true;
-                        muteButton.textContent = '🔊';
+                        console.log(`Music playing: ${playlist[currentTrackIndex]}`);
+                        muteButton.textContent = '🔊'; musicManuallyPaused = false;
                     }).catch(error => {
-                        console.log("Autoplay LIGR prevented. User interaction needed.", error);
-                        // Музыка не запустилась автоматически, пользователь должен будет нажать mute/unmute
-                        musicPlaying = false;
+                        console.log("Play prevented by browser policy: ", error);
+                        musicShouldPlay = false; // Если не удалось запустить, сбрасываем флаг
                         muteButton.textContent = '🔇';
                     });
                 }
             }
         }
-
         muteButton.addEventListener('click', () => {
-            if (backgroundMusic.paused) {
-                backgroundMusic.volume = 0.3; // Устанавливаем громкость перед воспроизведением
-                backgroundMusic.play().then(() => {
-                    musicPlaying = true;
-                    muteButton.textContent = '🔊';
-                }).catch(error => console.log("Error playing music on click:", error));
-            } else {
-                backgroundMusic.pause();
-                musicPlaying = false;
-                muteButton.textContent = '🔇';
+            if (!userInteracted) { // Если это первое взаимодействие через кнопку Mute
+                userInteracted = true;
+                musicShouldPlay = true;
+            } else if (!musicShouldPlay) { // Если музыка была запрещена, но пользователь нажал снова
+                 musicShouldPlay = true;
+            }
+
+            if (musicShouldPlay) {
+                if (backgroundMusic.paused) {
+                    musicManuallyPaused = false;
+                    tryToPlayMusic(); 
+                } else {
+                    backgroundMusic.pause(); musicManuallyPaused = true; muteButton.textContent = '🔇';
+                }
             }
         });
-        
-        // Начальная настройка громкости, даже если музыка еще не играет
+        backgroundMusic.addEventListener('ended', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length; 
+            backgroundMusic.src = playlist[currentTrackIndex];
+            if (musicShouldPlay && !musicManuallyPaused) { 
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => { muteButton.textContent = '🔊'; })
+                             .catch(error => { muteButton.textContent = '🔇'; });
+                }
+            }
+        });
         backgroundMusic.volume = 0.3;
-
+        if (playlist.length > 0) backgroundMusic.src = playlist[currentTrackIndex];
 
         window.addEventListener('resize', () => {
-            setCanvasSize();
-            setupControlsBasedOnDevice(); 
-            updatePlayerPosition(); 
-            const pSize = getPlayerSize();
-            if (player.x > canvas.width - pSize.width) player.x = canvas.width - pSize.width;
+            setCanvasSize(); setupControlsBasedOnDevice(); updatePlayerPosition(); 
+            const pS = getPlayerSize();
+            if (player.x > canvas.width - pS.width) player.x = canvas.width - pS.width;
             if (player.x < 0) player.x = 0;
         });
         
-        // Инициализация
-        setupControlsBasedOnDevice(); 
-        updateLivesDisplay();
-        updatePlayerPosition(); 
-        player.x = canvas.width / 2 - getPlayerSize().width / 2; 
-        // Не запускаем gameLoop сразу, дадим шанс музыке загрузиться или пользователю взаимодействовать
-        // gameLoop(); // Перенесено или будет вызвано после tryToPlayMusic
-        
-        // Попытка запустить музыку после загрузки страницы (может быть заблокирована браузером)
         window.addEventListener('load', () => {
-            // Не вызываем tryToPlayMusic здесь, так как это может быть слишком рано
-            // Лучше при первом взаимодействии пользователя
-            gameLoop(); // Запускаем игровой цикл после загрузки всего
+            setupControlsBasedOnDevice(); 
+            updateLevelAndScoreDisplays(); 
+            updateHealthBar(); 
+            updatePlayerPosition(); 
+            player.x = canvas.width / 2 - getPlayerSize().width / 2; 
+            
+            if (backgroundMusic.paused) muteButton.textContent = '🔇';
+            // Не пытаемся автозапускать музыку здесь. Ждем первого взаимодействия.
+            gameLoop(); 
         });
-
-
     </script>
 </body>
 </html>
