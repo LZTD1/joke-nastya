@@ -549,7 +549,7 @@
 
     const DEBUFF_DURATION = 20000;
     let playerOriginalSpeed = 8;
-    let mobilePlayerSpeed = 5;
+    let mobilePlayerSpeed = 3;
     let isPlayerSlowed = false;
     let slowdownEndTime = 0;
     let buffMessageTimeout = null;
@@ -567,6 +567,7 @@
     let mobileItemSize = 45;
     let mobileEnemySize = 45;
     let mobileDebafBafSize = 50;
+	
     let currentPlayerSize = desktopPlayerSize;
     let currentItemSize = desktopItemSize;
     let currentEnemySize = desktopEnemySize;
@@ -605,8 +606,8 @@
     const bafs = [];
     const itemTemplate = {baseWidth: 292, baseHeight: 323, speed: 3, img: new Image()};
     const enemyTemplate = {baseWidth: 386, baseHeight: 379, speed: 2.5, img: new Image()};
-    const debafTemplate = {baseWidth: 162, baseHeight: 163, speed: 2.2, img: new Image()};
-    const bafTemplate = {baseWidth: 139, baseHeight: 154, speed: 2.8, img: new Image()};
+    const debafTemplate = { baseWidth: 162, baseHeight: 163, speed: 1.8, img: new Image() }; // было 2.2
+	const bafTemplate = { baseWidth: 139, baseHeight: 154, speed: 2.0, img: new Image() }; // было 2.8
 
     function getItemSize() {
         let size = currentItemSize;
@@ -686,7 +687,7 @@
         const size = getItemSize();
         items.push({
             x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
-            width: size.width, height: size.height, speed: (2 + Math.random() * 1.5) * gameSpeed,
+            width: size.width, height: size.height, speed: (1.5 + Math.random() * 1.0) * gameSpeed,
             img: itemTemplate.img, type: 'item'
         });
     }
@@ -695,7 +696,7 @@
         const size = getEnemySize();
         enemies.push({
             x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
-            width: size.width, height: size.height, speed: (1.5 + Math.random() * 1) * gameSpeed,
+            width: size.width, height: size.height, speed: (1.0 + Math.random() * 0.8) * gameSpeed,
             img: enemyTemplate.img, type: 'enemy'
         });
     }
@@ -727,11 +728,15 @@
 
     function updateLevelLogic() {
         const newLevel = Math.floor(score / 100) + 1;
-        if (newLevel !== level) {
-            level = newLevel;
-            gameSpeed = 0.8 + (level - 1) * 0.1;
-        }
-        updateLevelAndScoreDisplays();
+		if (newLevel !== level) {
+			level = newLevel;
+			// gameSpeed = 0.8 + (level - 1) * 0.1; // Старая
+			gameSpeed = 0.7 + (level - 1) * 0.025; // НОВАЯ: более низкий старт и рост в 4 раза медленнее
+												 // 0.8 -> 0.7 (небольшое снижение базы)
+												 // 0.1 -> 0.025 (рост уменьшен в 4 раза)
+			console.log(`New Level: ${level}, Game Speed: ${gameSpeed.toFixed(3)}`); // Для отладки
+		}
+		updateLevelAndScoreDisplays(); 
     }
 
     function updateHealthBar() {
@@ -743,20 +748,26 @@
     }
 
     function getSpawnRates() {
-        const baseItemRate = 0.010;
-        const baseEnemyRate = 0.0025;
-        const baseDebafRate = 0.0004;
-        const baseBafRate = 0.0018;
-        const enemyGrowthFactor = 0.0010 * level;
-        const debafGrowthFactor = 0.0002 * level;
-        const itemGrowth = (level - 1) * 0.0025;
-        const maxItemRate = 0.05;
-        return {
-            itemRate: Math.min(baseItemRate + itemGrowth, maxItemRate),
-            enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.08),
-            debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.02),
-            bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)
-        };
+        const baseItemRate = 0.010; 
+		// const baseEnemyRate = 0.0025; // Старая
+		const baseEnemyRate = 0.0008; // НОВАЯ: значительно ниже база (в ~3 раза)
+		const baseDebafRate = 0.0002; 
+		const baseBafRate = 0.0018;   
+
+		// const enemyGrowthFactor = 0.0010 * level; // Старый рост
+		const enemyGrowthFactor = 0.0003 * level; // НОВЫЙ: рост тоже в ~3 раза медленнее
+		
+		const debafGrowthFactor = 0.0001 * level; 
+		const itemGrowth = (level - 1) * 0.0025; 
+		const maxItemRate = 0.05; 
+
+		return {
+			itemRate: Math.min(baseItemRate + itemGrowth, maxItemRate),
+			// enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.08), // Старый максимум
+			enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.035), // НОВЫЙ: Макс. шанс врагов ~3.5%
+			debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.02), 
+			bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)   
+		};
     }
 
     function showTemporaryMessage(element, message, duration) {
