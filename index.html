@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ловец предметов</title>
     <style>
         body {
@@ -15,6 +15,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            -webkit-text-size-adjust: 100%; 
         }
         
         #gameContainer {
@@ -27,6 +28,8 @@
         #gameCanvas {
             display: block;
             background-color: #4CAF50;
+            width: 100%;
+            height: 100%;
         }
         
         #gameUI {
@@ -44,61 +47,69 @@
             padding: 8px;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            margin-bottom: 10px; /* Added for spacing between stacked UI panels */
+            margin-bottom: 10px; 
         }
         
         #score {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px; /* Adjusted for mobile first approach */
+            left: 10px;
             color: white;
-            font-size: 24px;
+            font-size: 18px; /* Default smaller size */
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
         
         #lives {
             position: absolute;
-            top: 75px; /* Adjusted position due to panel bg */
-            left: 20px;
+            top: 45px; 
+            left: 10px;
             color: white;
-            font-size: 20px;
+            font-size: 16px; /* Default smaller size */
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+         #lives .heart, #lives .empty-heart {
+            font-size: 16px;
+        }
+        #lives div[style*="font-size: 12px"] { 
+            font-size: 10px !important;
         }
         
         #controls {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             color: white;
-            font-size: 14px;
+            font-size: 12px; /* Smaller for desktop too */
             text-align: right;
-            background: rgba(0,0,0,0.5); /* Kept existing, good enough */
-            padding: 10px;
-            border-radius: 8px;
+            background: rgba(0,0,0,0.5); 
+            padding: 8px;
+            border-radius: 5px;
             pointer-events: auto;
         }
         
         #sizeControls {
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         .size-control {
-            margin: 5px 0;
+            margin: 3px 0;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 5px;
         }
         
         .size-control input {
-            width: 60px;
-            padding: 2px 5px;
+            width: 45px; /* Smaller inputs */
+            padding: 1px 3px;
+            font-size: 10px;
         }
         
         .size-control label {
-            min-width: 80px;
+            min-width: auto; /* Allow label to shrink */
+            font-size: 10px;
             text-align: right;
         }
         
@@ -108,80 +119,174 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 32px;
+            font-size: 24px; /* Default smaller size */
             font-weight: bold;
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             background: rgba(0,0,0,0.7);
-            padding: 30px;
+            padding: 20px;
             border-radius: 15px;
             display: none;
+            z-index: 20;
+            width: 80%;
+        }
+         #gameOver div[style*="font-size: 24px"] { /* Style for final score text */
+            font-size: 18px !important;
+            margin: 10px 0 !important;
+        }
+        #gameOver div[style*="font-size: 18px"] { /* Style for restart text */
+            font-size: 14px !important;
         }
         
         #levelProgress {
             position: absolute;
-            top: 10px; /* Adjusted to fit panel */
+            top: 5px; 
             left: 50%;
             transform: translateX(-50%);
-            width: 300px;
+            width: 60%; 
+            min-width: 150px; /* Adjusted min-width */
             color: white;
             text-align: center;
+            font-size: 12px; /* Default smaller size */
         }
         
         .progress-bar {
             width: 100%;
-            height: 20px;
+            height: 15px; /* Default smaller size */
             background: rgba(0,0,0,0.5);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #4CAF50, #81C784);
-            border-radius: 10px;
+            border-radius: 8px;
             transition: width 0.3s ease;
         }
         
-        .heart {
-            color: #ff4757;
-            font-size: 18px;
-            margin-right: 2px;
-        }
-        
-        .empty-heart {
-            color: #666;
-            font-size: 18px;
-            margin-right: 2px;
-        }
-
         #slowdownInfo {
             position: absolute;
-            top: 160px; /* Adjusted position */
-            left: 20px;
-            color: #FFEB3B; /* Yellow for warning */
-            font-size: 16px;
+            top: 85px; 
+            left: 10px;
+            color: #FFEB3B; 
+            font-size: 12px; /* Default smaller size */
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
             display: none;
+            padding: 5px;
         }
 
         #buffMessage {
             position: absolute;
-            top: 40%; /* Adjusted to not overlap GameOver */
+            top: 40%; 
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #81C784; /* Light green for buff */
-            font-size: 28px;
+            color: #81C784; 
+            font-size: 20px; /* Default smaller size */
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             background: rgba(0,0,0,0.65);
-            padding: 15px 25px;
+            padding: 10px 15px;
             border-radius: 10px;
             display: none;
-            z-index: 20; /* Above other UI */
+            z-index: 20; 
         }
+
+        #mobileControls {
+            position: fixed; /* Use fixed to ensure it's always at the bottom of the viewport */
+            bottom: 15px;    /* Adjusted bottom spacing */
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; 
+            z-index: 15; 
+            gap: 30px; /* Increased gap for better touch separation */
+        }
+
+        .mobile-button {
+            width: 65px; /* Default smaller size */
+            height: 65px;/* Default smaller size */
+            background-color: rgba(0, 0, 0, 0.5); /* Slightly less transparent */
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.7); /* Softer border */
+            border-radius: 50%;
+            font-size: 28px; /* Adjusted font size */
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* Subtle shadow */
+        }
+
+        .mobile-button:active {
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(0.95); /* Feedback on press */
+        }
+
+        /* Desktop specific adjustments (larger screens) */
+        @media (min-width: 769px) {
+            #score {
+                font-size: 24px;
+                top: 20px;
+                left: 20px;
+            }
+            #lives {
+                font-size: 20px;
+                top: 75px;
+                left: 20px;
+            }
+            #lives .heart, #lives .empty-heart {
+                font-size: 18px;
+            }
+            #lives div[style*="font-size: 10px"] { 
+                font-size: 12px !important;
+            }
+            #controls {
+                font-size: 14px;
+                padding: 10px;
+                top: 20px;
+                right: 20px;
+            }
+            #sizeControls { margin-top: 10px; }
+            .size-control { margin: 5px 0; gap: 10px; }
+            .size-control input { width: 60px; padding: 2px 5px; font-size: 12px;}
+            .size-control label { min-width: 80px; font-size: 12px;}
+
+            #gameOver { font-size: 32px; padding: 30px; }
+             #gameOver div[style*="font-size: 18px"] { font-size: 24px !important; margin: 15px 0 !important;}
+             #gameOver div[style*="font-size: 14px"] { font-size: 18px !important;}
+
+
+            #levelProgress {
+                width: 300px;
+                font-size: 14px; /* Larger font for level text on desktop */
+                top: 10px;
+            }
+            .progress-bar { height: 20px; margin-top: 5px; }
+            #slowdownInfo {
+                font-size: 16px;
+                top: 160px;
+                left: 20px;
+            }
+            #buffMessage { font-size: 28px; padding: 15px 25px;}
+        }
+         /* For very small mobile screens, slightly smaller buttons */
+        @media (max-width: 360px) {
+            .mobile-button {
+                width: 55px;
+                height: 55px;
+                font-size: 24px;
+            }
+            #mobileControls {
+                gap: 20px;
+                bottom: 10px;
+            }
+        }
+
 
     </style>
 </head>
@@ -195,7 +300,7 @@
                 <div style="font-size: 12px; margin-top: 5px;">Восстановление: <span id="regenTimer">60</span>с</div>
             </div>
             <div id="levelProgress" class="ui-panel">
-                <div>Уровень <span id="level">1</span> - Прогресс до следующего уровня</div>
+                <div>Уровень <span id="level">1</span> - Прогресс</div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill" style="width: 0%"></div>
                 </div>
@@ -204,28 +309,32 @@
              <div id="buffMessage"></div>
 
             <div id="controls">
-                <div>Управление: ← → стрелки</div>
+                <div>Управление: ← → / A D</div>
                 <div>Ловите предметы, избегайте врагов!</div>
                 <div id="sizeControls">
                     <div class="size-control">
                         <label>Игрок:</label>
-                        <input type="number" id="playerSize" value="250" min="20" max="400">
+                        <input type="number" id="playerSizeInput" value="200" min="20" max="400">
                     </div>
                     <div class="size-control">
                         <label>Предметы:</label>
-                        <input type="number" id="itemSize" value="100" min="10" max="150">
+                        <input type="number" id="itemSizeInput" value="100" min="10" max="150">
                     </div>
                     <div class="size-control">
                         <label>Враги:</label>
-                        <input type="number" id="enemySize" value="100" min="10" max="150">
+                        <input type="number" id="enemySizeInput" value="100" min="10" max="150">
                     </div>
                 </div>
             </div>
             <div id="gameOver">
                 <div>Игра окончена!</div>
                 <div style="font-size: 24px; margin: 15px 0;">Финальный счет: <span id="finalScore">0</span></div>
-                <div style="font-size: 18px;">Нажмите R для перезапуска</div>
+                <div style="font-size: 18px;">Нажмите R или тапните для перезапуска</div>
             </div>
+        </div>
+        <div id="mobileControls">
+            <button id="moveLeftButton" class="mobile-button">◀</button>
+            <button id="moveRightButton" class="mobile-button">▶</button>
         </div>
     </div>
 
@@ -241,9 +350,17 @@
         const progressFillElement = document.getElementById('progressFill');
         const slowdownInfoElement = document.getElementById('slowdownInfo');
         const buffMessageElement = document.getElementById('buffMessage');
+        const controlsElement = document.getElementById('controls'); 
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        const playerSizeInput = document.getElementById('playerSizeInput');
+        const itemSizeInput = document.getElementById('itemSizeInput');
+        const enemySizeInput = document.getElementById('enemySizeInput');
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize(); 
 
         let score = 0;
         let lives = 5;
@@ -251,124 +368,150 @@
         let gameRunning = true;
         let animationId;
         let level = 1;
-        let gameSpeed = 1.0; // Initial game speed multiplier
+        let gameSpeed = 1.0; 
         let regenTimer = 60;
         let lastRegenTime = Date.now();
 
-        const DEBUFF_DURATION = 20000; // 20 seconds in ms
-        let playerOriginalSpeed = 8; // Store base speed of player
+        const DEBUFF_DURATION = 20000; 
+        let playerOriginalSpeed = 8; 
         let isPlayerSlowed = false;
         let slowdownEndTime = 0;
         let buffMessageTimeout = null;
 
+        // --- Размеры по умолчанию ---
+        // Десктоп
+        let desktopPlayerSize = 200;
+        let desktopItemSize = 100;
+        let desktopEnemySize = 100;
+        // Мобильные
+        let mobilePlayerSize = 90;  // Уменьшено
+        let mobileItemSize = 45;    // Уменьшено
+        let mobileEnemySize = 45;   // Уменьшено
+        let mobileDebafBafSize = 50; // Уменьшено для дебафов/бафов на мобильных
+
+        // Текущие активные размеры (будут меняться в зависимости от режима)
+        let currentPlayerSize = desktopPlayerSize;
+        let currentItemSize = desktopItemSize;
+        let currentEnemySize = desktopEnemySize;
+        let currentDebafBafSize = 70; // Дефолтный для десктопа
+
 
         const background = new Image();
-        background.src = 'bg.png';
+        background.src = 'bg.png'; 
         background.onerror = function() { console.log('Фоновое изображение не найдено'); };
 
         const player = {
             x: canvas.width / 2,
-            y: canvas.height - 120, // Will be updated by updatePlayerPosition
-            baseWidth: 80, // Default, will be overridden by getPlayerSize
-            baseHeight: 157,
+            y: canvas.height - 120, 
+            baseWidth: 398, baseHeight: 780, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ GG.PNG
             speed: 8,
             img: new Image()
         };
         playerOriginalSpeed = player.speed;
 
-
         function updatePlayerPosition() {
             const playerSize = getPlayerSize();
-            player.y = canvas.height - playerSize.height - 20;
+            player.y = canvas.height - playerSize.height - Math.max(10, canvas.height * 0.02); // Отступ снизу, адаптивный
         }
 
         function getPlayerSize() {
-            const size = parseInt(document.getElementById('playerSize').value) || 250;
-            return { width: size, height: Math.round(size * (780/398)) };
+            let size = currentPlayerSize;
+            if (controlsElement.style.display !== 'none' && playerSizeInput.value) { 
+                size = parseInt(playerSizeInput.value) || currentPlayerSize;
+            }
+            return { width: size, height: Math.round(size * (player.baseHeight/player.baseWidth)) };
         }
 
         const items = [];
         const enemies = [];
-        const debafs = []; // For debuff items
-        const bafs = [];   // For buff items
-
+        const debafs = []; 
+        const bafs = [];   
 
         const itemTemplate = {
-            baseWidth: 100, baseHeight: Math.round(100 * (323/292)),
+            baseWidth: 292, baseHeight: 323, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ ITEM.PNG
             speed: 3, img: new Image()
         };
         const enemyTemplate = {
-            baseWidth: 100, baseHeight: Math.round(100 * (379/386)),
+            baseWidth: 386, baseHeight: 379, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ ENEMY.PNG
             speed: 2.5, img: new Image()
         };
-        const debafTemplate = { // debaf.png 162x163
-            baseWidth: 100, baseHeight: Math.round(100 * (163/162)),
+        const debafTemplate = { 
+            baseWidth: 162, baseHeight: 163, // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ DEBAF.PNG
             speed: 2.2, img: new Image()
         };
-        const bafTemplate = { // baf.png 139x154
-            baseWidth: 100, baseHeight: Math.round(100 * (154/139)),
+        const bafTemplate = { 
+            baseWidth: 139, baseHeight: 154,  // ЗАМЕНИТЕ НА РЕАЛЬНЫЕ ПРОПОРЦИИ BAF.PNG
             speed: 2.8, img: new Image()
         };
 
-
         function getItemSize() {
-            const size = parseInt(document.getElementById('itemSize').value) || 100;
+            let size = currentItemSize;
+             if (controlsElement.style.display !== 'none' && itemSizeInput.value) {
+                size = parseInt(itemSizeInput.value) || currentItemSize;
+            }
             return { width: size, height: Math.round(size * (itemTemplate.baseHeight/itemTemplate.baseWidth)) };
         }
         function getEnemySize() {
-            const size = parseInt(document.getElementById('enemySize').value) || 100;
+            let size = currentEnemySize;
+             if (controlsElement.style.display !== 'none' && enemySizeInput.value) {
+                size = parseInt(enemySizeInput.value) || currentEnemySize;
+            }
             return { width: size, height: Math.round(size * (enemyTemplate.baseHeight/enemyTemplate.baseWidth)) };
         }
-        // For debafs and bafs, we'll use their template base sizes as they don't have individual UI controls
+        
         function getDebafSize() {
-            return { width: debafTemplate.baseWidth, height: debafTemplate.baseHeight };
+            return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (debafTemplate.baseHeight/debafTemplate.baseWidth)) };
         }
         function getBafSize() {
-            return { width: bafTemplate.baseWidth, height: bafTemplate.baseHeight };
+             return { width: currentDebafBafSize, height: Math.round(currentDebafBafSize * (bafTemplate.baseHeight/bafTemplate.baseWidth)) };
         }
 
-        player.img.src = 'gg.png';
-        itemTemplate.img.src = 'item.png';
-        enemyTemplate.img.src = 'enemy.png';
-        debafTemplate.img.src = 'debaf.png';
-        bafTemplate.img.src = 'baf.png';
+        player.img.src = 'gg.png'; 
+        itemTemplate.img.src = 'item.png'; 
+        enemyTemplate.img.src = 'enemy.png'; 
+        debafTemplate.img.src = 'debaf.png'; 
+        bafTemplate.img.src = 'baf.png'; 
 
-        player.img.onerror = function() { console.log('Изображение игрока не найдено'); };
-        itemTemplate.img.onerror = function() { console.log('Изображение предмета не найдено'); };
-        enemyTemplate.img.onerror = function() { console.log('Изображение врага не найдено'); };
-        debafTemplate.img.onerror = function() { console.log('Изображение дебаффа (debaf.png) не найдено'); };
-        bafTemplate.img.onerror = function() { console.log('Изображение баффа (baf.png) не найдено'); };
-
+        [player.img, itemTemplate.img, enemyTemplate.img, debafTemplate.img, bafTemplate.img].forEach(img => {
+            img.onerror = function() { console.log(`Изображение ${this.src.substring(this.src.lastIndexOf('/')+1)} не найдено`); };
+        });
 
         const keys = {};
+        // Флаги для мобильного управления, чтобы избежать конфликта с клавиатурой, если обработчики тач-событий будут активны одновременно с keydown/up
+        let moveLeftActive = false;
+        let moveRightActive = false;
+
         document.addEventListener('keydown', (e) => {
-            keys[e.key] = true;
-            if ((e.key === 'r' || e.key === 'R') && !gameRunning) restartGame();
+            const key = e.key.toLowerCase();
+            keys[key] = true; 
+            if (key === 'r' && !gameRunning) restartGame();
         });
-        document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        document.addEventListener('keyup', (e) => { 
+            keys[e.key.toLowerCase()] = false; 
+        });
 
         function createItem() {
             const size = getItemSize();
             items.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height,
+                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50, // Немного разброса по Y
                 width: size.width, height: size.height,
-                speed: (itemTemplate.speed + Math.random() * 1) * gameSpeed,
+                speed: (2 + Math.random() * 1.5) * gameSpeed, 
                 img: itemTemplate.img, type: 'item'
             });
         }
         function createEnemy() {
             const size = getEnemySize();
             enemies.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height,
+                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
                 width: size.width, height: size.height,
-                speed: (enemyTemplate.speed + Math.random() * 0.5) * gameSpeed,
+                speed: (1.5 + Math.random() * 1) * gameSpeed, 
                 img: enemyTemplate.img, type: 'enemy'
             });
         }
         function createDebaf() {
             const size = getDebafSize();
             debafs.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height,
+                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
                 width: size.width, height: size.height,
                 speed: (debafTemplate.speed + Math.random() * 0.5) * gameSpeed,
                 img: debafTemplate.img, type: 'debaf'
@@ -377,7 +520,7 @@
         function createBaf() {
             const size = getBafSize();
             bafs.push({
-                x: Math.random() * (canvas.width - size.width), y: -size.height,
+                x: Math.random() * (canvas.width - size.width), y: -size.height - Math.random() * 50,
                 width: size.width, height: size.height,
                 speed: (bafTemplate.speed + Math.random() * 0.5) * gameSpeed,
                 img: bafTemplate.img, type: 'baf'
@@ -388,7 +531,7 @@
             const newLevel = Math.floor(score / 100) + 1;
             if (newLevel !== level) {
                 level = newLevel;
-                gameSpeed = 0.8 + (level - 1) * 0.1; // Slower initial ramp up
+                gameSpeed = 0.8 + (level - 1) * 0.1; 
                 levelElement.textContent = level;
             }
             const progressInLevel = (score % 100) / 100;
@@ -396,16 +539,16 @@
         }
 
         function getSpawnRates() {
-            const baseItemRate = 0.01; 
-            const baseEnemyRate = 0.005;
-            const baseDebafRate = 0.0008; // Rarer
-            const baseBafRate = 0.001;   // Rarer
+            const baseItemRate = 0.012; // Чуть чаще предметы
+            const baseEnemyRate = 0.0035; 
+            const baseDebafRate = 0.0005; 
+            const baseBafRate = 0.0018;   
 
             return {
                 itemRate: baseItemRate + (level - 1) * 0.004,
-                enemyRate: Math.min(baseEnemyRate + (level - 1) * 0.006, 0.05),
-                debafRate: Math.min(baseDebafRate + (level - 1) * 0.0005, 0.01), // Increases slowly
-                bafRate: Math.min(baseBafRate + (level - 1) * 0.0007, 0.012)   // Increases slowly
+                enemyRate: Math.min(baseEnemyRate + (level - 1) * 0.0045, 0.04), 
+                debafRate: Math.min(baseDebafRate + (level - 1) * 0.00035, 0.007), 
+                bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)   
             };
         }
         
@@ -419,7 +562,6 @@
                 element.style.display = 'none';
             }, duration);
         }
-
 
         function updateLives() {
             const now = Date.now();
@@ -448,9 +590,21 @@
 
         function updatePlayer() {
             const playerSize = getPlayerSize();
-            updatePlayerPosition();
-            if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
-            if (keys['ArrowRight'] && player.x < canvas.width - playerSize.width) player.x += player.speed;
+            updatePlayerPosition(); 
+
+            const movingLeft = keys['arrowleft'] || keys['a'] || moveLeftActive;
+            const movingRight = keys['arrowright'] || keys['d'] || moveRightActive;
+
+            if (movingLeft && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (movingRight && player.x < canvas.width - playerSize.width) {
+                 player.x += player.speed;
+            }
+             // Убедимся, что игрок не выходит за границы после движения
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - playerSize.width) player.x = canvas.width - playerSize.width;
+
 
             if (isPlayerSlowed) {
                 const remainingSlowdown = Math.max(0, (slowdownEndTime - Date.now()) / 1000);
@@ -464,19 +618,19 @@
         }
 
         function updateGameObjects(arr, onCollect, onMiss) {
-            const playerSize = getPlayerSize();
+            const playerSize = getPlayerSize(); 
             for (let i = arr.length - 1; i >= 0; i--) {
                 const obj = arr[i];
                 obj.y += obj.speed;
-                if (obj.x < player.x + playerSize.width &&
-                    obj.x + obj.width > player.x &&
-                    obj.y < player.y + playerSize.height &&
-                    obj.y + obj.height > player.y) {
-                    onCollect(obj, i);
+                if (obj.x + obj.width > player.x && // Правый край объекта > левого края игрока
+                    obj.x < player.x + playerSize.width && // Левый край объекта < правого края игрока
+                    obj.y + obj.height > player.y && // Нижний край объекта > верхнего края игрока
+                    obj.y < player.y + playerSize.height) { // Верхний край объекта < нижнего края игрока
+                    onCollect(obj, i); 
                     continue; 
                 }
-                if (obj.y > canvas.height) {
-                    if (onMiss) onMiss(obj, i);
+                if (obj.y > canvas.height + 50) { // +50 чтобы точно ушли за экран
+                    if (onMiss) onMiss(obj, i); 
                     arr.splice(i, 1);
                 }
             }
@@ -501,13 +655,15 @@
         function updateDebafs() {
             updateGameObjects(debafs, (debaf, i) => {
                 debafs.splice(i, 1);
-                if (!isPlayerSlowed) {
+                if (!isPlayerSlowed) { 
                     isPlayerSlowed = true;
-                    // playerOriginalSpeed is already set at init/restart
-                    player.speed = playerOriginalSpeed / 2; // Halve speed
+                    player.speed = playerOriginalSpeed / 2; 
                     slowdownEndTime = Date.now() + DEBUFF_DURATION;
                     slowdownInfoElement.style.display = 'block';
-                     showTemporaryMessage(buffMessageElement, "ЗАМЕДЛЕНИЕ!", 2000);
+                    showTemporaryMessage(buffMessageElement, "ЗАМЕДЛЕНИЕ!", 2000);
+                } else { 
+                     slowdownEndTime = Date.now() + DEBUFF_DURATION; 
+                     showTemporaryMessage(buffMessageElement, "Замедление продлено!", 1500);
                 }
             });
         }
@@ -524,13 +680,12 @@
             });
         }
 
-
         function drawBackground() {
             if (background.complete && background.naturalWidth > 0) {
                 const ar = background.naturalWidth / background.naturalHeight;
                 let drawWidth = canvas.width;
                 let drawHeight = canvas.width / ar;
-                if (drawHeight < canvas.height) {
+                if (drawHeight < canvas.height) { 
                     drawHeight = canvas.height;
                     drawWidth = canvas.height * ar;
                 }
@@ -550,7 +705,7 @@
             const playerSize = getPlayerSize();
             if (player.img.complete && player.img.naturalWidth > 0) {
                 ctx.drawImage(player.img, player.x, player.y, playerSize.width, playerSize.height);
-            } else {
+            } else { 
                 ctx.fillStyle = '#FF6B6B';
                 ctx.fillRect(player.x, player.y, playerSize.width, playerSize.height);
             }
@@ -560,7 +715,7 @@
             arr.forEach(obj => {
                 if (obj.img.complete && obj.img.naturalWidth > 0) {
                     ctx.drawImage(obj.img, obj.x, obj.y, obj.width, obj.height);
-                } else {
+                } else { 
                     ctx.fillStyle = defaultColor;
                     if (shape === 'rect') {
                          ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
@@ -586,10 +741,11 @@
 
         function gameLoop() {
             if (!gameRunning) return;
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBackground();
 
-            updatePlayer();
+            updatePlayer(); // Обновляем игрока ДО создания новых объектов
             updateItems();
             updateEnemies();
             updateDebafs();
@@ -599,15 +755,15 @@
             drawPlayer();
             drawArray(items, '#FFD700', 'diamond');
             drawArray(enemies, '#FF4757', 'triangle');
-            drawArray(debafs, '#BCA0DC', 'rect'); // Purple-ish for debaf placeholder
-            drawArray(bafs, '#90EE90', 'rect');   // Light green for baf placeholder
-
+            drawArray(debafs, '#BCA0DC', 'rect'); 
+            drawArray(bafs, '#90EE90', 'rect');   
 
             const spawnRates = getSpawnRates();
-            if (Math.random() < spawnRates.itemRate) createItem();
-            if (Math.random() < spawnRates.enemyRate) createEnemy();
-            if (Math.random() < spawnRates.debafRate) createDebaf();
-            if (Math.random() < spawnRates.bafRate) createBaf();
+            if (items.length < 10 && Math.random() < spawnRates.itemRate) createItem(); // Ограничение на кол-во предметов
+            if (enemies.length < 5 && Math.random() < spawnRates.enemyRate) createEnemy(); // Ограничение на кол-во врагов
+            if (debafs.length < 2 && Math.random() < spawnRates.debafRate) createDebaf();
+            if (bafs.length < 2 && Math.random() < spawnRates.bafRate) createBaf();
+
 
             animationId = requestAnimationFrame(gameLoop);
         }
@@ -616,12 +772,12 @@
             score = 0;
             lives = 5;
             level = 1;
-            gameSpeed = 0.8; // Reset game speed
+            gameSpeed = 0.8; 
             regenTimer = 60;
             lastRegenTime = Date.now();
             
             isPlayerSlowed = false;
-            player.speed = playerOriginalSpeed; // Restore original speed
+            player.speed = playerOriginalSpeed; 
             slowdownInfoElement.style.display = 'none';
             if (buffMessageTimeout) clearTimeout(buffMessageTimeout);
             buffMessageElement.style.display = 'none';
@@ -630,13 +786,15 @@
             levelElement.textContent = level;
             progressFillElement.style.width = '0%';
             updateLivesDisplay();
-            updatePlayerPosition();
             
             items.length = 0; enemies.length = 0; debafs.length = 0; bafs.length = 0;
-            player.x = canvas.width / 2 - getPlayerSize().width / 2; // Center player
+            
+            updatePlayerPosition(); // Устанавливаем Y
+            player.x = canvas.width / 2 - getPlayerSize().width / 2; // Центрируем X
 
             gameRunning = true;
             gameOverElement.style.display = 'none';
+            if (animationId) cancelAnimationFrame(animationId); // Отменяем предыдущий цикл, если был
             gameLoop();
         }
 
@@ -647,20 +805,89 @@
             cancelAnimationFrame(animationId);
         }
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            updatePlayerPosition();
-            const playerSize = getPlayerSize();
-            if (player.x > canvas.width - playerSize.width) {
-                player.x = canvas.width - playerSize.width;
-            }
-        });
+        const moveLeftButton = document.getElementById('moveLeftButton');
+        const moveRightButton = document.getElementById('moveRightButton');
+        const mobileControlsElement = document.getElementById('mobileControls');
 
-        // Initial setup
+        function isTouchDevice() {
+            return (('ontouchstart' in window) ||
+                   (navigator.maxTouchPoints > 0) ||
+                   (navigator.msMaxTouchPoints > 0));
+        }
+
+        function setupControlsBasedOnDevice() {
+            const touchDevice = isTouchDevice();
+            const narrowWindow = window.innerWidth <= 768;
+
+            if (touchDevice || narrowWindow) {
+                mobileControlsElement.style.display = 'flex';
+                controlsElement.style.display = 'none'; 
+
+                currentPlayerSize = mobilePlayerSize;
+                currentItemSize = mobileItemSize;
+                currentEnemySize = mobileEnemySize;
+                currentDebafBafSize = mobileDebafBafSize;
+
+                playerSizeInput.value = currentPlayerSize;
+                itemSizeInput.value = currentItemSize;
+                enemySizeInput.value = currentEnemySize;
+            } else {
+                 mobileControlsElement.style.display = 'none';
+                 controlsElement.style.display = 'block'; 
+                 currentPlayerSize = desktopPlayerSize;
+                 currentItemSize = desktopItemSize;
+                 currentEnemySize = desktopEnemySize;
+                 currentDebafBafSize = 70; // Desktop default for baf/debaf
+
+                 playerSizeInput.value = currentPlayerSize;
+                 itemSizeInput.value = currentItemSize;
+                 enemySizeInput.value = currentEnemySize;
+            }
+        }
+        
+        // Обработчики для мобильных кнопок
+        moveLeftButton.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            moveLeftActive = true;
+        }, { passive: false }); 
+        moveLeftButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            moveLeftActive = false;
+        }, { passive: false });
+
+        moveRightButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveRightActive = true;
+        }, { passive: false });
+        moveRightButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            moveRightActive = false;
+        }, { passive: false });
+
+        // Рестарт по тапу на GameOver
+        gameOverElement.addEventListener('click', () => { // Click для десктопа тоже
+             if (!gameRunning) restartGame();
+        });
+         gameOverElement.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameRunning) restartGame();
+        }, { passive: false });
+
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            setupControlsBasedOnDevice(); 
+            updatePlayerPosition(); 
+            const pSize = getPlayerSize();
+            if (player.x > canvas.width - pSize.width) player.x = canvas.width - pSize.width;
+            if (player.x < 0) player.x = 0;
+        });
+        
+        // Инициализация
+        setupControlsBasedOnDevice(); 
         updateLivesDisplay();
-        updatePlayerPosition(); // Set initial Y position correctly
-        player.x = canvas.width / 2 - getPlayerSize().width / 2; // Center player X
+        updatePlayerPosition(); 
+        player.x = canvas.width / 2 - getPlayerSize().width / 2; 
         gameLoop();
     </script>
 </body>
