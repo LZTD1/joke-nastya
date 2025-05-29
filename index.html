@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
+     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ловец Настя</title>
-	<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-	<link rel="shortcut icon" href="/favicon.ico" />
-	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-	<meta name="apple-mobile-web-app-title" content="Настя" />
-	<link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Настя" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         body {
             margin: 0;
@@ -82,7 +83,7 @@
             font-size: 10px !important;
         }
         
-        #controls { /* Блок с настройками размеров */
+        #controls {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -93,7 +94,7 @@
             padding: 8px;
             border-radius: 5px;
             pointer-events: auto;
-            display: none; /* Скрыт по умолчанию, JS покажет для десктопа */
+            display: none; /* Скрыты по умолчанию, будут показаны JS для десктопа */
         }
         
         #sizeControls {
@@ -201,12 +202,13 @@
             z-index: 20; 
         }
 
-        #mobileControls { /* Кнопки ◀ ▶ */
+        #mobileControls {
+			display: none;
             position: fixed; 
             bottom: 15px;    
             left: 50%;
             transform: translateX(-50%);
-            display: none; /* Скрыты по умолчанию, JS покажет для мобильных */
+            display: none; /* Скрыты по умолчанию, будут показаны JS для мобильных */
             z-index: 15; 
             gap: 30px; 
         }
@@ -237,7 +239,7 @@
         #muteButton {
             position: fixed;
             top: 10px;
-            right: 10px; 
+            right: 10px; /* Будет сдвинут если #controls видимы */
             width: 40px;
             height: 40px;
             background-color: rgba(0,0,0,0.5);
@@ -249,12 +251,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 25; 
-            pointer-events: auto; 
+            z-index: 25; /* Выше всего */
+            pointer-events: auto; /* Чтобы можно было нажать */
         }
 
 
-        @media (min-width: 769px) { /* Стили для десктопа */
+        @media (min-width: 769px) {
             #score {
                 font-size: 24px;
                 top: 20px;
@@ -271,13 +273,12 @@
             #lives div[style*="font-size: 10px"] { 
                 font-size: 12px !important;
             }
-            /* #controls будет показан JS */
+            /* #controls - будет показан JS */
             #controls { 
                 font-size: 14px;
                 padding: 10px;
                 top: 20px;
                 right: 20px;
-                /* display: block !important; /* Гарантируем показ, если JS не справится */
             }
 
             #sizeControls { margin-top: 10px; }
@@ -303,24 +304,18 @@
             }
             #buffMessage { font-size: 28px; padding: 15px 25px;}
 
-            #muteButton { 
+            #muteButton { /* Позиция кнопки звука на десктопе */
                 top: 20px;
-                /* Позиционирование кнопки звука относительно #controls, если он виден */
-                /* right: calc(20px + 200px + 10px); /* Пример: отступ справа + ширина #controls + еще отступ */
-                /* Проще просто задать фиксированное значение, если #controls имеет фиксированную ширину */
-                right: 230px; /* Если controls ~200px шириной */
+                right: 190px; /* Правее блока #controls */
             }
-             /* Если #controls скрыт (например, игра только началась), то #muteButton будет справа */
-            body:not(:has(#controls[style*="display: block"])) #muteButton {
-                right: 20px;
-            }
+            /* Если #controls очень широкий, можно сдвинуть еще левее */
+            /* Если #controls скрыт, то #muteButton будет справа вверху */
         }
-        @media (max-width: 768px) { /* Стили для мобильных и планшетов */
-             #muteButton { 
+        @media (max-width: 768px) {
+             #muteButton { /* Позиция кнопки звука на мобильных */
                 top: 10px;
                 right: 10px;
             }
-            /* #mobileControls будет показан JS */
         }
 
         @media (max-width: 360px) {
@@ -330,6 +325,7 @@
                 font-size: 24px;
             }
             #mobileControls {
+			    display: visibility;
                 gap: 20px;
                 bottom: 10px;
             }
@@ -347,7 +343,7 @@
         <source src="music.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
-    <button id="muteButton">🔊</button> 
+    <button id="muteButton">🔊</button> <!-- Кнопка для вкл/выкл звука -->
 
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
@@ -372,7 +368,7 @@
                 <div id="sizeControls">
                     <div class="size-control">
                         <label>Игрок:</label>
-                        <input type="number" id="playerSizeInput" value="230" min="20" max="400"> {/* Увеличено для десктопа */}
+                        <input type="number" id="playerSizeInput" value="200" min="20" max="400">
                     </div>
                     <div class="size-control">
                         <label>Предметы:</label>
@@ -390,7 +386,7 @@
                 <div style="font-size: 18px;">Нажмите R или тапните для перезапуска</div>
             </div>
         </div>
-        <div id="mobileControls"> {/* Кнопки ◀ ▶ */}
+        <div id="mobileControls">
             <button id="moveLeftButton" class="mobile-button">◀</button>
             <button id="moveRightButton" class="mobile-button">▶</button>
         </div>
@@ -439,10 +435,10 @@
         let isPlayerSlowed = false;
         let slowdownEndTime = 0;
         let buffMessageTimeout = null;
-        let musicPlaying = false; 
+        let musicPlaying = false; // Флаг для отслеживания состояния музыки
 
 
-        let desktopPlayerSize = 230; // Увеличено на 30 (было 200)
+        let desktopPlayerSize = 200;
         let desktopItemSize = 100;
         let desktopEnemySize = 100;
         
@@ -451,7 +447,7 @@
         let mobileEnemySize = 45;   
         let mobileDebafBafSize = 50; 
 
-        let currentPlayerSize = desktopPlayerSize; // Изначально десктопный
+        let currentPlayerSize = desktopPlayerSize;
         let currentItemSize = desktopItemSize;
         let currentEnemySize = desktopEnemySize;
         let currentDebafBafSize = 70; 
@@ -476,9 +472,8 @@
         }
 
         function getPlayerSize() {
-            let size = currentPlayerSize; // Используем текущее установленное значение
-            // Если десктопные контролы видимы и в инпуте есть значение, берем его
-            if (controlsElement.style.display === 'block' && playerSizeInput.value) { 
+            let size = currentPlayerSize;
+            if (controlsElement.style.display !== 'none' && playerSizeInput.value) { 
                 size = parseInt(playerSizeInput.value) || currentPlayerSize;
             }
             return { width: size, height: Math.round(size * (player.baseHeight/player.baseWidth)) };
@@ -508,14 +503,14 @@
 
         function getItemSize() {
             let size = currentItemSize;
-             if (controlsElement.style.display === 'block' && itemSizeInput.value) {
+             if (controlsElement.style.display !== 'none' && itemSizeInput.value) {
                 size = parseInt(itemSizeInput.value) || currentItemSize;
             }
             return { width: size, height: Math.round(size * (itemTemplate.baseHeight/itemTemplate.baseWidth)) };
         }
         function getEnemySize() {
             let size = currentEnemySize;
-             if (controlsElement.style.display === 'block' && enemySizeInput.value) {
+             if (controlsElement.style.display !== 'none' && enemySizeInput.value) {
                 size = parseInt(enemySizeInput.value) || currentEnemySize;
             }
             return { width: size, height: Math.round(size * (enemyTemplate.baseHeight/enemyTemplate.baseWidth)) };
@@ -546,11 +541,12 @@
             const key = e.key.toLowerCase();
             keys[key] = true; 
             if (key === 'r' && !gameRunning) restartGame();
-            tryToPlayMusic(); 
+            tryToPlayMusic(); // Попытка запустить музыку при первом взаимодействии
         });
         document.addEventListener('keyup', (e) => { 
             keys[e.key.toLowerCase()] = false; 
         });
+        // Попытка запустить музыку при первом тапе (для мобильных)
         document.body.addEventListener('touchstart', tryToPlayMusic, { once: true });
 
 
@@ -595,7 +591,7 @@
             const newLevel = Math.floor(score / 100) + 1;
             if (newLevel !== level) {
                 level = newLevel;
-                gameSpeed = 0.8 + (level - 1) * 0.1; 
+                gameSpeed = 0.8 + (level - 1) * 0.1; // Базовое ускорение игры
                 levelElement.textContent = level;
             }
             const progressInLevel = (score % 100) / 100;
@@ -604,17 +600,19 @@
 
         function getSpawnRates() {
             const baseItemRate = 0.012; 
-            const baseEnemyRate = 0.0030; 
-            const baseDebafRate = 0.0004; 
+            const baseEnemyRate = 0.0030; // Слегка уменьшаем базовый шанс врага
+            const baseDebafRate = 0.0004; // Слегка уменьшаем базовый шанс дебафа
             const baseBafRate = 0.0018;   
 
-            const enemyGrowthFactor = 0.0008 * level; 
-            const debafGrowthFactor = 0.0002 * level; 
+            // Увеличиваем множитель роста для врагов и дебафов
+            // Чем выше уровень, тем значительнее увеличивается их шанс
+            const enemyGrowthFactor = 0.0008 * level; // Быстрее растет с уровнем
+            const debafGrowthFactor = 0.0002 * level; // Быстрее растет с уровнем
 
             return {
                 itemRate: baseItemRate + (level - 1) * 0.004,
-                enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.06), 
-                debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.015), 
+                enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.06), // Макс. шанс 6%
+                debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.015), // Макс. шанс 1.5%
                 bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)   
             };
         }
@@ -825,7 +823,7 @@
 
             const spawnRates = getSpawnRates();
             if (items.length < 10 && Math.random() < spawnRates.itemRate) createItem(); 
-            if (enemies.length < 7 && Math.random() < spawnRates.enemyRate) createEnemy(); 
+            if (enemies.length < 7 && Math.random() < spawnRates.enemyRate) createEnemy(); // Увеличил немного лимит врагов
             if (debafs.length < 2 && Math.random() < spawnRates.debafRate) createDebaf();
             if (bafs.length < 2 && Math.random() < spawnRates.bafRate) createBaf();
 
@@ -853,14 +851,13 @@
             
             items.length = 0; enemies.length = 0; debafs.length = 0; bafs.length = 0;
             
-            setupControlsBasedOnDevice(); // Устанавливаем правильные размеры перед позиционированием
             updatePlayerPosition(); 
             player.x = canvas.width / 2 - getPlayerSize().width / 2; 
 
             gameRunning = true;
             gameOverElement.style.display = 'none';
             if (animationId) cancelAnimationFrame(animationId); 
-            tryToPlayMusic(); 
+            tryToPlayMusic(); // Попытка включить музыку при рестарте
             gameLoop();
         }
 
@@ -869,6 +866,10 @@
             finalScoreElement.textContent = score;
             gameOverElement.style.display = 'block';
             cancelAnimationFrame(animationId);
+            // Можно остановить музыку при окончании игры, если нужно
+            // backgroundMusic.pause();
+            // musicPlaying = false;
+            // muteButton.textContent = '🔇';
         }
 
         const moveLeftButton = document.getElementById('moveLeftButton');
@@ -884,7 +885,7 @@
             const touchDevice = isTouchDevice();
             const narrowWindow = window.innerWidth <= 768;
 
-            if (touchDevice || narrowWindow) { // Мобильный режим или узкое окно
+            if (narrowWindow) {
                 mobileControlsElement.style.display = 'flex';
                 controlsElement.style.display = 'none'; 
 
@@ -892,7 +893,7 @@
                 currentItemSize = mobileItemSize;
                 currentEnemySize = mobileEnemySize;
                 currentDebafBafSize = mobileDebafBafSize;
-            } else { // Десктопный режим
+            } else { // Desktop
                  mobileControlsElement.style.display = 'none';
                  controlsElement.style.display = 'block'; 
                  currentPlayerSize = desktopPlayerSize;
@@ -900,17 +901,10 @@
                  currentEnemySize = desktopEnemySize;
                  currentDebafBafSize = 70; 
             }
-            // Обновляем значения в инпутах, если они видимы (особенно для десктопа)
-            playerSizeInput.value = currentPlayerSize; // Записываем текущий размер в инпут
+            // Обновляем значения в инпутах, если они видимы
+            playerSizeInput.value = currentPlayerSize;
             itemSizeInput.value = currentItemSize;
             enemySizeInput.value = currentEnemySize;
-
-            // Корректируем позицию кнопки звука если #controls (десктопный) меняет видимость
-            if (controlsElement.style.display === 'block') {
-                muteButton.style.right = '230px'; // Примерное положение правее #controls
-            } else {
-                muteButton.style.right = '10px'; // Стандартное положение для мобильных
-            }
         }
         
         moveLeftButton.addEventListener('touchstart', (e) => {
@@ -941,6 +935,7 @@
             if (!gameRunning) restartGame();
         }, { passive: false });
 
+        // --- Управление музыкой ---
         function tryToPlayMusic() {
             if (!musicPlaying && backgroundMusic.paused) {
                 backgroundMusic.volume = 0.3;
@@ -950,7 +945,8 @@
                         musicPlaying = true;
                         muteButton.textContent = '🔊';
                     }).catch(error => {
-                        console.log("Autoplay LIGR prevented by browser. User interaction needed.", error);
+                        console.log("Autoplay LIGR prevented. User interaction needed.", error);
+                        // Музыка не запустилась автоматически, пользователь должен будет нажать mute/unmute
                         musicPlaying = false;
                         muteButton.textContent = '🔇';
                     });
@@ -960,7 +956,7 @@
 
         muteButton.addEventListener('click', () => {
             if (backgroundMusic.paused) {
-                backgroundMusic.volume = 0.3; 
+                backgroundMusic.volume = 0.3; // Устанавливаем громкость перед воспроизведением
                 backgroundMusic.play().then(() => {
                     musicPlaying = true;
                     muteButton.textContent = '🔊';
@@ -972,6 +968,7 @@
             }
         });
         
+        // Начальная настройка громкости, даже если музыка еще не играет
         backgroundMusic.volume = 0.3;
 
 
@@ -984,13 +981,21 @@
             if (player.x < 0) player.x = 0;
         });
         
+        // Инициализация
+        setupControlsBasedOnDevice(); 
+        updateLivesDisplay();
+        updatePlayerPosition(); 
+        player.x = canvas.width / 2 - getPlayerSize().width / 2; 
+        // Не запускаем gameLoop сразу, дадим шанс музыке загрузиться или пользователю взаимодействовать
+        // gameLoop(); // Перенесено или будет вызвано после tryToPlayMusic
+        
+        // Попытка запустить музыку после загрузки страницы (может быть заблокирована браузером)
         window.addEventListener('load', () => {
-            setupControlsBasedOnDevice(); // Устанавливаем контролы и размеры при загрузке
-            updateLivesDisplay();
-            updatePlayerPosition(); 
-            player.x = canvas.width / 2 - getPlayerSize().width / 2; 
-            gameLoop(); 
+            // Не вызываем tryToPlayMusic здесь, так как это может быть слишком рано
+            // Лучше при первом взаимодействии пользователя
+            gameLoop(); // Запускаем игровой цикл после загрузки всего
         });
+
 
     </script>
 </body>
