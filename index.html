@@ -764,7 +764,7 @@
 		return {
 			itemRate: Math.min(baseItemRate + itemGrowth, maxItemRate),
 			// enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.08), // Старый максимум
-			enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.035), // НОВЫЙ: Макс. шанс врагов ~3.5%
+			enemyRate: Math.min(baseEnemyRate + enemyGrowthFactor, 0.25), // НОВЫЙ: Макс. шанс врагов ~3.5%
 			debafRate: Math.min(baseDebafRate + debafGrowthFactor, 0.02), 
 			bafRate: Math.min(baseBafRate + (level - 1) * 0.0009, 0.018)   
 		};
