@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ловец Настя: Final Balance</title>
+    <title>Ловец Настя: Mobile Balance</title>
     <style>
         :root {
             --primary: #4CAF50;
@@ -270,7 +270,11 @@
             this.y = -this.height - 20;
             
             let levelCap = Math.min(Game.level, 30);
-            let speedMult = Game.gameSpeed * (1 + (levelCap * 0.06));
+            
+            // --- ИЗМЕНЕНИЕ СКОРОСТИ ---
+            // Если мобильный, то замедляем базу в 2 раза
+            let mobileFactor = isMobile ? 0.5 : 1.0; 
+            let speedMult = Game.gameSpeed * (1 + (levelCap * 0.06)) * mobileFactor;
             
             if (type === 'item') this.speed = (3 + Math.random()) * speedMult;
             else if (type === 'buff') this.speed = (5 + Math.random()) * speedMult;
@@ -280,7 +284,10 @@
                 if (this.subtype === 'tracker') this.speed = (3 + Math.random()) * speedMult; 
                 if (this.subtype === 'ghost') this.speed = (5 + Math.random() * 2) * speedMult; 
             }
-            if (type === 'projectile') { this.speed = 7 * Game.gameSpeed; this.width = 30; this.height = 30; }
+            if (type === 'projectile') { 
+                this.speed = 7 * Game.gameSpeed * mobileFactor; // Замедляем и снаряды
+                this.width = 30; this.height = 30; 
+            }
         }
         update() {
             this.y += this.speed;
@@ -288,8 +295,12 @@
                 if (this.subtype === 'tracker') {
                     const centerPlayer = Game.player.x + Game.player.width/2;
                     const centerEnemy = this.x + this.width/2;
-                    if (centerEnemy < centerPlayer - 10) this.x += 1.5 * Game.gameSpeed;
-                    else if (centerEnemy > centerPlayer + 10) this.x -= 1.5 * Game.gameSpeed;
+                    
+                    const isMobile = Game.width <= 768;
+                    const trackSpeed = isMobile ? 0.7 : 1.5; // Замедляем слежение на телефоне
+
+                    if (centerEnemy < centerPlayer - 10) this.x += trackSpeed * Game.gameSpeed;
+                    else if (centerEnemy > centerPlayer + 10) this.x -= trackSpeed * Game.gameSpeed;
                 }
                 if (this.subtype === 'ghost') this.opacity = 0.4 + Math.abs(Math.sin(Date.now() / 200)) * 0.6;
             }
@@ -326,27 +337,19 @@
         return 'normal';
     }
 
-    // --- ИСПРАВЛЕННЫЙ СПАВНЕР (БАЛАНС) ---
+    // --- СПАВНЕР ---
     function handleSpawning() {
         Game.spawnTimer--;
         
         if (Game.spawnTimer <= 0) {
             if (Game.bossMode) {
-                // --- ЛОГИКА БОССА ---
-                // Теперь хилки не падают каждый кадр. Спавн контролируется таймером.
-                // Шанс хилки 15%, Предмет 85%
                 if (Math.random() < 0.15) Game.objects.push(new GameObject('buff'));
                 else Game.objects.push(new GameObject('item'));
-                
-                // Таймер спавна на боссе (немного чаще, чем обычно)
                 Game.spawnTimer = 50; 
             } 
             else {
-                // --- ОБЫЧНАЯ ЛОГИКА ---
                 const r = Math.random();
                 let buffChance = (Game.lives <= 2) ? 0.15 : 0.08; 
-                
-                // УВЕЛИЧИЛ ШАНС ПРЕДМЕТОВ (было 0.35, стало 0.45)
                 let itemChance = 0.45; 
                 let debuffChance = 0.05;
                 
@@ -357,7 +360,15 @@
 
                 const difficultyMod = Game.isHardcore ? 15 : 0;
                 const levelMod = Math.min(30, Game.level * 3);
-                Game.spawnInterval = Math.max(20, 65 - levelMod - difficultyMod);
+                
+                // Адаптация интервала спавна под телефон
+                const isMobile = Game.width <= 768;
+                let baseInterval = Math.max(20, 65 - levelMod - difficultyMod);
+                
+                // На телефоне спавним чуть реже, чтобы не было каши из медленных врагов
+                if (isMobile) baseInterval = Math.floor(baseInterval * 1.3);
+
+                Game.spawnInterval = baseInterval;
                 Game.spawnTimer = Game.spawnInterval + (Math.random() * 20);
             }
         }
@@ -368,7 +379,12 @@
             this.width = Game.width <= 768 ? 150 : 250; this.height = this.width;
             this.x = Game.width/2 - this.width/2; this.y = 50;
             this.hp = 100; this.maxHp = 100; this.direction = 1;
-            this.moveSpeed = 3; this.shootTimer = 0;
+            
+            const isMobile = Game.width <= 768;
+            // Замедляем босса на телефоне
+            this.moveSpeed = isMobile ? 1.5 : 3; 
+            
+            this.shootTimer = 0;
             this.img = Game.images['enemy'];
         }
         update() {
@@ -539,9 +555,11 @@
         const goToggle = document.getElementById('hardcoreToggleGO');
         const isStartScreenVisible = !document.getElementById('startScreen').classList.contains('hidden');
         
-        Game.isHardcore = isStartScreenVisible ? startToggle.checked : goToggle.checked;
-        startToggle.checked = Game.isHardcore;
-        goToggle.checked = Game.isHardcore;
+        if (startToggle && goToggle) {
+            Game.isHardcore = isStartScreenVisible ? startToggle.checked : goToggle.checked;
+            startToggle.checked = Game.isHardcore;
+            goToggle.checked = Game.isHardcore;
+        } else { Game.isHardcore = false; }
 
         Game.maxLives = Game.isHardcore ? 1 : 5; 
         Game.lives = Game.maxLives;
@@ -558,26 +576,36 @@
         document.getElementById('bossContainer').style.display='none';
         
         resize(); updateUI(); startNewQuest();
-        document.getElementById('bgMusic').play().catch(()=>{});
+        
+        const audio = document.getElementById('bgMusic');
+        if(audio) audio.play().catch(e => console.log("Audio play failed, interaction needed"));
     }
 
     function gameOver() {
         Game.isRunning=false;
         document.getElementById('finalScore').textContent=Game.score;
         document.getElementById('gameOverScreen').classList.remove('hidden');
-        document.getElementById('hardcoreToggleGO').checked = Game.isHardcore;
+        const goToggle = document.getElementById('hardcoreToggleGO');
+        if(goToggle) goToggle.checked = Game.isHardcore;
     }
 
     function gameLoop() {
         Game.ctx.clearRect(0,0,Game.width,Game.height);
-        if(Game.images.bg.complete) Game.ctx.drawImage(Game.images.bg,0,0,Game.width,Game.height);
-        else { Game.ctx.fillStyle='#222'; Game.ctx.fillRect(0,0,Game.width,Game.height); }
+        if(Game.images.bg.complete && Game.images.bg.naturalWidth > 0) {
+            Game.ctx.drawImage(Game.images.bg,0,0,Game.width,Game.height);
+        } else { 
+            Game.ctx.fillStyle='#222'; Game.ctx.fillRect(0,0,Game.width,Game.height); 
+        }
 
         if(Game.isRunning) update();
 
         if (Game.bossMode && Game.boss) Game.boss.draw(Game.ctx);
-        if(Game.images.player.complete) Game.ctx.drawImage(Game.images.player,Game.player.x,Game.player.y,Game.player.width,Game.player.height);
-        else { Game.ctx.fillStyle=CONFIG.colors.primary; Game.ctx.fillRect(Game.player.x,Game.player.y,Game.player.width,Game.player.height); }
+        if(Game.images.player.complete && Game.images.player.naturalWidth > 0) {
+            Game.ctx.drawImage(Game.images.player,Game.player.x,Game.player.y,Game.player.width,Game.player.height);
+        } else { 
+            Game.ctx.fillStyle=CONFIG.colors.primary; 
+            Game.ctx.fillRect(Game.player.x,Game.player.y,Game.player.width,Game.player.height); 
+        }
         
         if (Game.isRunning || !document.getElementById('gameOverScreen').classList.contains('hidden')) {
             Game.objects.forEach(o=>o.draw(Game.ctx));
@@ -605,13 +633,29 @@
         window.addEventListener('resize', resize);
         document.addEventListener('keydown', e=>{if(e.code==='ArrowLeft'||e.code==='KeyA')Game.keys.left=true; if(e.code==='ArrowRight'||e.code==='KeyD')Game.keys.right=true;});
         document.addEventListener('keyup', e=>{if(e.code==='ArrowLeft'||e.code==='KeyA')Game.keys.left=false; if(e.code==='ArrowRight'||e.code==='KeyD')Game.keys.right=false;});
-        const lZ=document.getElementById('leftZone'); const rZ=document.getElementById('rightZone');
-        if(lZ) { lZ.addEventListener('touchstart',e=>{e.preventDefault();Game.keys.left=true;}); lZ.addEventListener('touchend',e=>{e.preventDefault();Game.keys.left=false;}); }
-        if(rZ) { rZ.addEventListener('touchstart',e=>{e.preventDefault();Game.keys.right=true;}); rZ.addEventListener('touchend',e=>{e.preventDefault();Game.keys.right=false;}); }
         
-        document.getElementById('startBtn').addEventListener('click', startGame);
-        document.getElementById('restartBtn').addEventListener('click', startGame);
-        document.getElementById('muteButton').addEventListener('click', function(){const a=document.getElementById('bgMusic'); if(a.paused){a.play();this.textContent='🔊';}else{a.pause();this.textContent='🔇';}});
+        const lZ=document.getElementById('leftZone'); 
+        const rZ=document.getElementById('rightZone');
+        if(lZ) {
+            lZ.addEventListener('touchstart',e=>{e.preventDefault();Game.keys.left=true;}); 
+            lZ.addEventListener('touchend',e=>{e.preventDefault();Game.keys.left=false;});
+        }
+        if(rZ) {
+            rZ.addEventListener('touchstart',e=>{e.preventDefault();Game.keys.right=true;}); 
+            rZ.addEventListener('touchend',e=>{e.preventDefault();Game.keys.right=false;});
+        }
+        
+        const startBtn = document.getElementById('startBtn');
+        if(startBtn) startBtn.addEventListener('click', startGame);
+
+        const restartBtn = document.getElementById('restartBtn');
+        if(restartBtn) restartBtn.addEventListener('click', startGame);
+
+        const muteBtn = document.getElementById('muteButton');
+        if(muteBtn) muteBtn.addEventListener('click', function(){
+            const a=document.getElementById('bgMusic'); 
+            if(a.paused){a.play();this.textContent='🔊';}else{a.pause();this.textContent='🔇';}
+        });
         
         resize(); gameLoop();
     });
